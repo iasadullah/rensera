@@ -1,0 +1,44 @@
+<html lang="en">
+	<head>
+    <title>Rensera </title>
+    <link rel="icon" href="%PUBLIC_URL%/favicon.png" />
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+		<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+		<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+		<!--[if lt IE 9]>
+		<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+		<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+		<![endif]-->
+		<script type="text/javascript">
+
+		function postMessageHandler(event)
+		{
+		  if (event.data == "printui_finished")
+			window.location = "https://rensera.live/layoutedit";
+		  
+		  if (event.data == "printui_cancel")
+			window.location = "https://rensera.live/layoutedit";
+		}
+
+		(window.addEventListener && window.addEventListener("message", postMessageHandler)) || 
+		(window.attachEvent && window.attachEvent("onmessage", postMessageHandler));
+		</script>
+	</head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    <!--
+      This HTML file is a template.
+      If you open it directly in the browser, you will see an empty page.
+
+      You can add webfonts, meta tags, or analytics to this file.
+      The build step will place the bundled scripts into the <body> tag.
+
+      To begin the development, run `npm start` or `yarn start`.
+      To create a production bundle, use `npm run build` or `yarn build`.
+    -->
+  </body>
+</html>
