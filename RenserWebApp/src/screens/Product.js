@@ -17,10 +17,19 @@ import {
   fetchAllTeam,
   fetchAllIndustry,
   fetchAllTemplate,
+  getAllTemplateList,
+  getAllTemplateListApi,
+  createNewProjectApi,
+  genereateHtmlApi,
+  getTemplateMetaData,
+  articlesList,
+  generatePdf,
+  generatePdfApi,
 } from "../services/api";
 import config from "../includes/config";
 import $ from "jquery";
 import ProductCard from "../components/productCard";
+let filePath = "";
 const Product = () => {
   const [state, setState] = useState({
     projectPopupType: "Create",
@@ -51,6 +60,11 @@ const Product = () => {
     templates: [],
     projects: [],
   });
+  const [templateList, setTemplateList] = useState([]);
+  const [templateId, setTemplateId] = useState(-1);
+  const [articles, setArticles] = useState([]);
+  const [selectedFileTextFrames, setSelectedFileTextFrames] = useState([]);
+  const [selections, setSelections] = useState({});
 
   useEffect(() => {
     getAllProject();
@@ -58,6 +72,8 @@ const Product = () => {
     getAllLeadPracticeGroups();
     getAllTeam();
     getAllIndustry();
+    getAllTemplateList();
+    getAllArticleList();
     //AppendScript("../assets/js/customs.js");
 
     $("#root").on("click", function (e) {
@@ -93,6 +109,14 @@ const Product = () => {
     });
   };
 
+  const getAllArticleList = async () => {
+    try {
+      let res = await articlesList();
+      setArticles(res);
+    } catch (error) {
+      console.log("getAllArticleList error::", error);
+    }
+  };
   const handleShow = () => {
     setState({ ...state, show: true, stepshow: false, imgPreviewshow: false });
     getAllTemplate();
@@ -371,6 +395,82 @@ const Product = () => {
     }
   };
 
+  const getAllTemplateList = async () => {
+    try {
+      const result = await getAllTemplateListApi();
+      console.log("getAllTemplateList :: ", result);
+      if (result.status == 200) {
+        setTemplateList(result.response);
+      }
+    } catch (error) {
+      console.log("getAllTemplateList error :: ", error);
+    }
+  };
+
+  const onSelectTemplate = async (_templateId, _templateFile) => {
+    try {
+      console.log("onSelectTemplate :: ", _templateId, _templateFile);
+      setTemplateId(_templateId);
+      const res = await getTemplateMetaData(_templateFile);
+      if (res.status == 200) {
+        if (res.message.toLowerCase() === "file processed successfully")
+          console.log("getTemplateMetaData :: ", res.response);
+        setSelectedFileTextFrames(res.response.textFrames);
+        // Update filePath in selections state
+        setSelections((prevSelections) => ({
+          ...prevSelections,
+          filePath: _templateFile,
+        }));
+      }
+    } catch (error) {
+      console.log("onSelectTemplate error :: ", error);
+    }
+  };
+
+  const onCreateNewProjectPressed = async () => {
+    try {
+      let data = {
+        projectName: state.projectName,
+        creatorFirstName: state.creatorFname,
+        creatorLastName: state.creatorLname,
+        templateId: templateId,
+      };
+      console.log("this is selection :: ", selections);
+      // let response = await createNewProjectApi(data);
+      // if (response.status == 201) {
+      //   if (
+      //     response.response.toLowerCase() === "project created successfully"
+      //   ) {
+      //     console.log("project created successfully");
+      //     let response = await genereateHtmlApi();
+      //   }
+      // }
+    } catch (error) {
+      console.log("onCreateNewProjectPressed error :: ", error);
+    }
+  };
+
+  const handleSelectChange = (index, event) => {
+    const selectedArticle = articles.find(
+      (article) => article.article_id === event.target.value
+    );
+    setSelections((prevSelections) => ({
+      ...prevSelections,
+      [index]: {
+        id: selectedFileTextFrames[index].id,
+        article_id: selectedArticle.article_id,
+        textFrameOriginal: selectedFileTextFrames[index].contents,
+        textFrameSelect: selectedArticle.title,
+        geometricBounds: selectedFileTextFrames[index].geometricBounds,
+      },
+    }));
+  };
+  const saveSelections = async () => {
+    console.log("this is selections :: ", selections);
+    const resp = await generatePdfApi(selections);
+    // ... same as before ...
+  };
+
   return (
     <div>
       <header className="fixed-top">
@@ -565,7 +665,31 @@ const Product = () => {
                         />
                       </div>
                     </div>
-                    <div className="col-md-12">
+                    <div>
+                      {selectedFileTextFrames.map((textFrame, index) => (
+                        <div key={index}>
+                          <p>{textFrame.contents}</p>
+                          <select
+                            value={selections[index]?.article_id || ""}
+                            onChange={(event) =>
+                              handleSelectChange(index, event)
+                            }
+                          >
+                            <option value="">Select...</option>
+                            {articles.map((article) => (
+                              <option
+                                key={article.article_id}
+                                value={article.article_id}
+                              >
+                                {article.title}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      ))}
+                      <button onClick={saveSelections}>Save Selections</button>
+                    </div>
+                    {/* <div className="col-md-12">
                       <div className="form-group">
                         <label for="exampleFormControlInput1">Office</label>
                         <select
@@ -652,7 +776,7 @@ const Product = () => {
                           {state.description}
                         </textarea>
                       </div>
-                    </div>
+                    </div> */}
                     <div className="col-md-12">
                       <div className="flex-box">
                         <input
@@ -663,8 +787,8 @@ const Product = () => {
                         <button
                           type="submit"
                           className="btn mb-2"
-                          onClick={
-                            mySubmitHandler
+                          onClick={() =>
+                            onCreateNewProjectPressed()
                           } /* onClick={stephandleShow}*/
                         >
                           {state.projectPopupType} Project
@@ -689,26 +813,28 @@ const Product = () => {
 
                   <div className="card">
                     <div className="card-body">
-                      {state.templates.map((item, i) => (
+                      {templateList.map((item, i) => (
                         <div
-                          id={item.templateId}
-                          onClick={(e) =>
-                            setState({
-                              selectedTemplateId: item.templateId,
-                              layoutName: item.layoutName,
-                            })
+                          id={item.id}
+                          // onClick={(e) =>
+                          //   setState({
+                          //     selectedTemplateId: item.templateId,
+                          //     layoutName: item.layoutName,
+                          //   })
+                          // }
+                          onClick={() =>
+                            onSelectTemplate(item.id, item.filename)
                           }
                           className={`${
-                            item.templateId == state.selectedTemplateId
-                              ? "box Active"
-                              : "box"
+                            item.id == templateId ? "box Active" : "box"
                           }`}
                         >
                           <div className="thumbnail">
-                            {item.templateImage != null ? (
+                            {item.image !== null ? (
                               <img
                                 className="thumb"
-                                src={config.IMG_URL + "" + item.templateImage}
+                                // src={config.IMG_URL + "" + item.templateImage}
+                                src={item.image}
                                 alt=""
                                 width="129"
                               />
@@ -728,7 +854,7 @@ const Product = () => {
                             </a>
                           </div>
                           <div className="right-box">
-                            <div className="title">{item.templateName}</div>
+                            <div className="title">{item.name}</div>
                             <p>Version 1.0.1</p>
                             <a href="javascript:void(0)" className="btn">
                               View Template

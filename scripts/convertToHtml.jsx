@@ -1,48 +1,52 @@
-﻿//OpenDocument.jsx
-//An InDesign Server JavaScript
-//Opens an existing document. You’ll have to fill in your own file path.
-function main(){
-var fileName=app.scriptArgs.getValue("arg1")
-$.writeln("File name is...."+fileName)
-var myFile = new File("C:/Users/sulem/Desktop/Demo/server/"+fileName);
-var folderExists = true;
-var result = "";
+﻿#include "json2.js"
+function main(inputPath, outputPath, mappingPath) {
+  var myFile = new File(inputPath);
+  var folderExists = true;
+  var result = "";
 
-// create the file if it does not exist
-if(!myFile.exists) {
-	// create the parent folder if necessary
-	if(!myFile.parent.exists){ 
-		folderExists = myFile.parent.create(); 
-	}
-	if(folderExists) {
-		// create a document, save it, and close it
-		var myDocument = app.documents.add();
-		myDocument = myDocument.save(myFile);
-		myDocument.close();
-	} else {
-		result = "Unable to create the folder:  " + myFile.path;
-	}
+  // Check if the file exists
+  if (!myFile.exists) {
+    result = "The file does not exist: " + inputPath;
+    return result;
+  }
+
+  // Open the document
+  var myDoc = app.open(myFile);
+
+  // The mapping between the HTML elements and the InDesign elements
+  var mapping = {};
+
+  // Add a unique identifier to each text frame
+  for (var i = 0; i < myDoc.textFrames.length; i++) {
+    var textFrame = myDoc.textFrames[i];
+    textFrame.label = i.toString(); // Use the index as the identifier
+
+    // Add the mapping between the HTML data-id and the InDesign ID
+    mapping[i] = textFrame.id;
+  }
+
+  // Export the document to FXL HTML
+  with (myDoc.htmlFXLExportPreferences) {
+    epubPageRangeFormat = PageRangeFormat.EXPORT_ALL_PAGES;
+  }
+
+  myDoc.exportFile(ExportFormat.HTMLFXL, new File(outputPath));
+
+  // Close the document
+  myDoc.close();
+
+  // Save the mapping to a file
+  var mappingFile = new File(mappingPath);
+  mappingFile.open('w');
+  mappingFile.write(JSON.stringify(mapping));
+  mappingFile.close();
+
+  return "Successful";
 }
 
-if (folderExists) {
+// The input, output, and mapping paths
+var inputPath = "C:/Users/sulem/Desktop/Demo/server/uploads/template.indt";
+var outputPath = "C:/Users/sulem/Desktop/Demo/server/generatedHtml/output.html";
+var mappingPath = "C:/Users/sulem/Desktop/Demo/server/generatedHtml/mapping.json";
 
-	// OPEN
-	var myDoc = app.open(myFile);
-
-	
-
-
-		// Export the page to FXL HTML
-		with (myDoc.htmlFXLExportPreferences) {
-			epubPageRangeFormat = PageRangeFormat.EXPORT_ALL_PAGES
-//			epubPageRangeFormat = PageRangeFormat.EXPORT_PAGE_RANGE
-//			epubPageRange = "1-2";
-		}
-    var outPutPath="C:/Users/sulem/Desktop/Demo/server/generatedHtml/";
-    var myDocBaseName="something"
-		myDoc.exportFile(ExportFormat.HTMLFXL, new File(outPutPath + "output.html"));
-return result="Successful";
-}
-
-}
-main();
+main(inputPath, outputPath, mappingPath);

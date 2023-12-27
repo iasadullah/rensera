@@ -53,10 +53,17 @@
 
 const express = require("express");
 const bodyParser = require("body-parser");
+const cors = require("cors");
+const path = require("path");
 const IndesignRoutes = require("./routes/Indesign");
 
 const app = express();
-
+app.use("/public", express.static(path.join(__dirname, "public")));
+app.use(
+  "/output-web-resources",
+  express.static(path.join(__dirname, "public/output/output-web-resources"))
+);
+app.use(cors());
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false, limit: "50mb" }));
 
@@ -66,6 +73,7 @@ app.use(
     limit: "50mb",
   })
 );
+
 app.use("/api", IndesignRoutes);
 // Centralized error handling middleware
 app.use((err, req, res, next) => {

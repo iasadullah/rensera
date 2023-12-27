@@ -4,7 +4,7 @@ function main(){
 var fileName = app.scriptArgs.getValue("arg1");
 $.writeln("fileName" + fileName);
 
-var myFile = new File("C:/Users/sulem/Desktop/Demo/server/" + fileName);
+var myFile = new File( fileName);
 var result = {};
 var resultString ;
 // Check if the file exists
@@ -33,10 +33,14 @@ if (myFile.exists) {
   result.textFrames = [];
   result.imageLinks = [];
 
+  // Initialize a counter for the text frame IDs
+  var textFrameId = 1;
+
   // Loop through all text frames in the document
   for (var i = 0; i < myDoc.textFrames.length; i++) {
     var myTextFrame = myDoc.textFrames[i];
     var textFrameData = {
+      id: textFrameId++, // Assign the current value of the counter as the ID and then increment the counter
       contents: myTextFrame.contents,
       geometricBounds: myTextFrame.geometricBounds
     };

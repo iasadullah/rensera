@@ -8,6 +8,7 @@ import LayoutEdit from "./screens/LayoutEdit";
 import Home from "./screens/Home";
 import DrupalScreen from "./screens/DrupalScreen";
 import UploadFileScreen from "./screens/UploadScreen";
+import EditHtml from "./screens/EditHtml";
 import "./assets/css/style.css";
 import "./assets/css/font-awesome.min.css";
 import "./assets/css/bootstrap.min.css";
@@ -24,6 +25,7 @@ function App() {
         <Route path="/systemmanager" component={SystemManager} />
         <Route path="/drupal" component={DrupalScreen} />
         <Route path="/upload" component={UploadFileScreen} />
+        <Route path="/edit-html" component={EditHtml} />
         <Route
           render={(props) => <LayoutEdit {...props} />}
           path="/layoutedit"

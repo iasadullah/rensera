@@ -1,0 +1,177 @@
+body, div, dl, dt, dd, h1, h2, h3, h4, h5, h6, p, pre, code, blockquote {
+	margin:0;
+	padding:0;
+	border-width:0;
+	text-rendering:optimizeSpeed;
+}
+div.Black-Fill {
+	border-style:solid;
+	background-color:#000000;
+}
+div.Blue-Fill {
+	border-style:solid;
+	background-color:#6aaadd;
+}
+div.Pale-Pink-Fill {
+	border-style:solid;
+	background-color:#f9d5c9;
+}
+div.Placeholder {
+	border-style:solid;
+	background-color:#939598;
+}
+div.Basic-Graphics-Frame {
+	border-color:#000000;
+	border-width:1px;
+	border-style:solid;
+}
+div.Basic-Text-Frame {
+	border-style:solid;
+}
+p.ParaOverride-1 {
+	line-height:1;
+	white-space:nowrap;
+}
+span.CharOverride-1 {
+	color:#000000;
+	font-family:"Ingra UltraLight", sans-serif;
+	font-size:180px;
+	font-style:normal;
+	font-weight:normal;
+}
+span.CharOverride-2 {
+	color:#6aaadd;
+	font-family:"Kiro Bold Italic", sans-serif;
+	font-size:280px;
+	font-style:normal;
+	font-weight:normal;
+}
+span.CharOverride-3 {
+	color:#000000;
+	font-family:"Azo Sans Black", sans-serif;
+	font-size:1560px;
+	font-style:normal;
+	font-weight:normal;
+}
+#_idContainer000 {
+	-ms-transform:translate(-8.504px,-8.504px) rotate(0.000deg) skew(0.000deg) scale(1.000,1.000);
+	-ms-transform-origin:0% 0%;
+	-webkit-transform:translate(-8.504px,-8.504px) rotate(0.000deg) skew(0.000deg) scale(1.000,1.000);
+	-webkit-transform-origin:0% 0%;
+	height:612.28px;
+	left:0px;
+	position:absolute;
+	top:0px;
+	transform:translate(-8.504px,-8.504px) rotate(0.000deg) skew(0.000deg) scale(1.000,1.000);
+	transform:translate(-8.504px,-8.504px) rotate(0.000deg) skew(0.000deg) scale(1.000,1.000);
+	transform-origin:0% 0%;
+	transform-origin:0% 0%;
+	width:436.54px;
+}
+#_idContainer001 {
+	-ms-transform:translate(265.322px,517.462px) rotate(0.000deg) skew(0.000deg) scale(1.000,1.000);
+	-ms-transform-origin:0% 0%;
+	-webkit-transform:translate(265.322px,517.462px) rotate(0.000deg) skew(0.000deg) scale(1.000,1.000);
+	-webkit-transform-origin:0% 0%;
+	height:5.43px;
+	left:0px;
+	position:absolute;
+	top:0px;
+	transform:translate(265.322px,517.462px) rotate(0.000deg) skew(0.000deg) scale(1.000,1.000);
+	transform:translate(265.322px,517.462px) rotate(0.000deg) skew(0.000deg) scale(1.000,1.000);
+	transform-origin:0% 0%;
+	transform-origin:0% 0%;
+	width:44.19px;
+}
+#_idContainer002 {
+	-ms-transform:translate(22.677px,289.133px) rotate(0.000deg) skew(0.000deg) scale(1.000,1.000);
+	-ms-transform-origin:0% 0%;
+	-webkit-transform:translate(22.677px,289.133px) rotate(0.000deg) skew(0.000deg) scale(1.000,1.000);
+	-webkit-transform-origin:0% 0%;
+	height:283.46px;
+	left:0px;
+	position:absolute;
+	top:0px;
+	transform:translate(22.677px,289.133px) rotate(0.000deg) skew(0.000deg) scale(1.000,1.000);
+	transform:translate(22.677px,289.133px) rotate(0.000deg) skew(0.000deg) scale(1.000,1.000);
+	transform-origin:0% 0%;
+	transform-origin:0% 0%;
+	width:206.93px;
+}
+#_idContainer003 {
+	-ms-transform:translate(36.850px,274.960px) rotate(0.000deg) skew(0.000deg) scale(1.000,1.000);
+	-ms-transform-origin:0% 0%;
+	-webkit-transform:translate(36.850px,274.960px) rotate(0.000deg) skew(0.000deg) scale(1.000,1.000);
+	-webkit-transform-origin:0% 0%;
+	height:283.46px;
+	left:0px;
+	position:absolute;
+	top:0px;
+	transform:translate(36.850px,274.960px) rotate(0.000deg) skew(0.000deg) scale(1.000,1.000);
+	transform:translate(36.850px,274.960px) rotate(0.000deg) skew(0.000deg) scale(1.000,1.000);
+	transform-origin:0% 0%;
+	transform-origin:0% 0%;
+	width:206.93px;
+}
+#_idContainer004 {
+	-ms-transform:translate(265.322px,530.003px) rotate(0.000deg) skew(0.000deg) scale(1.000,1.000);
+	-ms-transform-origin:0% 0%;
+	-webkit-transform:translate(265.322px,530.003px) rotate(0.000deg) skew(0.000deg) scale(1.000,1.000);
+	-webkit-transform-origin:0% 0%;
+	height:46.47px;
+	left:0px;
+	position:absolute;
+	top:0px;
+	transform:translate(265.322px,530.003px) rotate(0.000deg) skew(0.000deg) scale(1.000,1.000);
+	transform:translate(265.322px,530.003px) rotate(0.000deg) skew(0.000deg) scale(1.000,1.000);
+	transform-origin:0% 0%;
+	transform-origin:0% 0%;
+	width:131.53px;
+}
+#_idContainer005 {
+	-ms-transform:translate(175.748px,299.607px) rotate(0.000deg) skew(0.000deg) scale(1.000,1.000);
+	-ms-transform-origin:0% 0%;
+	-webkit-transform:translate(175.748px,299.607px) rotate(0.000deg) skew(0.000deg) scale(1.000,1.000);
+	-webkit-transform-origin:0% 0%;
+	background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAc0AAACTCAYAAADstkIuAAAACXBIWXMAABcRAAAXEQHKJvM/AAACbUlEQVR4Xu3XQQ0CQQAEwT2CEpRgAhWIABOoQAVGsLL3QMD2CxJS9Z5/Z7Y55wAA1g6rAQDwIZoAEIkmAESiCQCRaAJAJJoAEIkmAESiCQCRaAJAJJoAEIkmAESiCQCRaAJAJJoAEIkmAESiCQCRaAJAJJoAEIkmAESiCQCRaAJAJJoAEIkmAESiCQCRaAJAJJoAEIkmAESiCQCRaAJAJJoAEIkmAESiCQCRaAJAJJoAEIkmAESiCQCRaAJAJJoAEIkmAESiCQCRaAJAJJoAEIkmAESiCQCRaAJAJJoAEIkmAESiCQCRaAJAJJoAEIkmAESiCQCRaAJAJJoAEIkmAESiCQCRaAJAJJoAEIkmAESiCQCRaAJAJJoAEIkmAESiCQCRaAJAJJoAEIkmAESiCQCRaAJAJJoAEB1XA/hH1+f7Psa4rXbAT70el9N5NfomTxMAom3OudoAAMPTBIBMNAEgEk0AiEQTACLRBIBINAEgEk0AiEQTACLRBIBINAEgEk0AiEQTACLRBIBINAEgEk0AiEQTACLRBIBINAEgEk0AiEQTACLRBIBINAEgEk0AiEQTACLRBIBINAEgEk0AiEQTACLRBIBINAEgEk0AiEQTACLRBIBINAEgEk0AiEQTACLRBIBINAEgEk0AiEQTACLRBIBINAEgEk0AiEQTACLRBIBINAEgEk0AiEQTACLRBIBINAEgEk0AiEQTACLRBIBINAEgEk0AiEQTACLRBIBINAEgEk0AiEQTACLRBIBINAEgEk0AiEQTACLRBIBINAEgEk0AiEQTACLRBIBINAEgEk0AiEQTACLRBIBoB1SLDCFoWV21AAAAAElFTkSuQmCC);
+	background-repeat:no-repeat;
+	background-size:cover;
+	height:70.44px;
+	left:0px;
+	position:absolute;
+	top:0px;
+	transform:translate(175.748px,299.607px) rotate(0.000deg) skew(0.000deg) scale(1.000,1.000);
+	transform:translate(175.748px,299.607px) rotate(0.000deg) skew(0.000deg) scale(1.000,1.000);
+	transform-origin:0% 0%;
+	transform-origin:0% 0%;
+	width:221.10px;
+}
+#_idContainer006 {
+	-ms-transform:translate(22.677px,70.784px) rotate(0.000deg) skew(0.000deg) scale(1.000,1.000);
+	-ms-transform-origin:0% 0%;
+	-webkit-transform:translate(22.677px,70.784px) rotate(0.000deg) skew(0.000deg) scale(1.000,1.000);
+	-webkit-transform-origin:0% 0%;
+	height:181.40px;
+	left:0px;
+	position:absolute;
+	top:0px;
+	transform:translate(22.677px,70.784px) rotate(0.000deg) skew(0.000deg) scale(1.000,1.000);
+	transform:translate(22.677px,70.784px) rotate(0.000deg) skew(0.000deg) scale(1.000,1.000);
+	transform-origin:0% 0%;
+	transform-origin:0% 0%;
+	width:374.17px;
+}
+img._idGenObjectAttribute-1 {
+	height:100.00%;
+	min-width:100%;
+	width:100.00%;
+}
+img._idGenObjectAttribute-2 {
+	left:0px;
+	position:absolute;
+	top:0px;
+}
+div._idGenObjectStyle-Disabled {
+	background-color:transparent;
+	border-width:0px;
+}
