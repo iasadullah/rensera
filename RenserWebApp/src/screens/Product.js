@@ -25,11 +25,18 @@ import {
   articlesList,
   generatePdf,
   generatePdfApi,
+  createThumbnails,
+  convertHtmlApi,
+  getAllProjecstList
 } from "../services/api";
 import config from "../includes/config";
 import $ from "jquery";
 import ProductCard from "../components/productCard";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 let filePath = "";
+let fileName = '';
+let isDrupal = false
+let tempModificationsGlobal = [];
 const Product = () => {
   const [state, setState] = useState({
     projectPopupType: "Create",
@@ -59,20 +66,24 @@ const Product = () => {
     leadPracticeGroups: [],
     templates: [],
     projects: [],
+
   });
   const [templateList, setTemplateList] = useState([]);
   const [templateId, setTemplateId] = useState(-1);
   const [articles, setArticles] = useState([]);
   const [selectedFileTextFrames, setSelectedFileTextFrames] = useState([]);
   const [selections, setSelections] = useState({});
-
+  const [selectTemplate, setSelectTemplate] = useState(false);
+  const [projectList, setProjectList] = useState([]);
+  // const[tempModifications,setTempModfications]=useState([])
+  const history = useHistory()
   useEffect(() => {
-    getAllProject();
     getAllOffices();
     getAllLeadPracticeGroups();
     getAllTeam();
     getAllIndustry();
     getAllTemplateList();
+    getAllProject();
     getAllArticleList();
     //AppendScript("../assets/js/customs.js");
 
@@ -117,11 +128,45 @@ const Product = () => {
       console.log("getAllArticleList error::", error);
     }
   };
-  const handleShow = () => {
-    setState({ ...state, show: true, stepshow: false, imgPreviewshow: false });
-    getAllTemplate();
-  };
+  const handleShow = (someProp) => {
+    console.log("Some Prop is:", someProp.someProp)
+    if (someProp.someProp == 'Drupal') {
+      isDrupal = true
+    }
 
+    setState({ ...state, show: true, stepshow: false, imgPreviewshow: false });
+    console.log("The drupal is:", isDrupal)
+    // handleCreateThumbnails()
+    // getAllTemplate();
+  };
+  // console.log("The drupal is OUTside:", isDrupal)
+
+  const handleCreateThumbnails = async () => {
+    try {
+      //     const response =await createThumbnails()
+      //     console.log("The response of the thumbnails api is:",response)
+      //  if(response.status==200){   
+      // }
+      // getAllTemplateList()
+      // fetchthumbnails()
+    } catch (error) {
+      // Handle errors
+      console.error('Error calling API:', error.message);
+    }
+  };
+  // const fetchthumbnails=async()=>{
+  //   try {
+
+  //     const response = await axios.get('http://3.132.112.94:4000/api/workouts/api/images');
+  //     console.log("The response of fetching thumbnails is::",response)
+  //     const fetchedThumbnails=response.data.images
+  //     console.log("The fetched Thumbnails is:",fetchedThumbnails)
+  //     setThumbnails(fetchedThumbnails)
+  //   } catch (error) {
+  //     console.log("The error is:::",error)
+
+  //   }
+  // }
   const step2handleClose = () => {
     setState({
       ...state,
@@ -146,7 +191,9 @@ const Product = () => {
   };
 
   const stephandleShow = () => {
+    console.log("Working")
     setState({ ...state, show: false, stepshow: true, imgPreviewshow: false });
+    isDrupal = false
   };
 
   const previewhandleClose = () => {
@@ -209,8 +256,8 @@ const Product = () => {
             stepshow: true,
           });
           //handleClose();
-          //stephandleShow();
-          getAllProject();
+          stephandleShow();
+          // getAllProject();
         }
       })
       .catch(function (response) {
@@ -226,7 +273,7 @@ const Product = () => {
         ...state,
         offices: result,
       });
-    } catch (err) {}
+    } catch (err) { }
   };
 
   const getAllTeam = async () => {
@@ -236,7 +283,7 @@ const Product = () => {
         ...state,
         teams: result,
       });
-    } catch (err) {}
+    } catch (err) { }
   };
 
   const getAllIndustry = async () => {
@@ -246,7 +293,7 @@ const Product = () => {
         ...state,
         industries: result,
       });
-    } catch (err) {}
+    } catch (err) { }
   };
 
   const getAllLeadPracticeGroups = async () => {
@@ -256,7 +303,7 @@ const Product = () => {
         ...state,
         leadPracticeGroups: result,
       });
-    } catch (err) {}
+    } catch (err) { }
   };
 
   const getAllTemplate = async () => {
@@ -268,32 +315,34 @@ const Product = () => {
         templates: result,
         show: true,
       });
-    } catch (err) {}
+    } catch (err) { }
   };
 
   const getAllProject = async () => {
     try {
-      const result = await fetchAllProject();
-      setState({
-        ...state,
-        projects: result,
-      });
+      let result = await getAllProjecstList();
+      console.log("The result of all projects is::", result)
+      // setState({
+      //   ...state,
+      //   projects: result,
+      // });
+      setProjectList(result.data);
     } catch (err) {
-      console.log("asfasfsdf", err);
+      console.log("Error", err);
     }
   };
 
   const deleteHandler = async (projectId) => {
     try {
       await ondeleteProject(projectId);
-      getAllProject();
-    } catch (err) {}
+      // getAllProject();
+    } catch (err) { }
   };
 
   const copyHandler = (projectId) => {
     alert(projectId);
     axios.get(config.API_URL + "copyProject/" + projectId).then((result) => {
-      getAllProject();
+      // getAllProject();
       console.log("Copied Successfully.");
     });
   };
@@ -302,8 +351,8 @@ const Product = () => {
     try {
       $(".box-show").hide();
       await onChangeProjectStatus(projectId, status);
-      getAllProject();
-    } catch (err) {}
+      // getAllProject();
+    } catch (err) { }
   };
 
   const previewHandler = (e) => {
@@ -313,7 +362,7 @@ const Product = () => {
       show: false,
       stepshow: false,
       imgPreviewshow: true,
-      previewImg: previewimage,
+      previewImg: e.image,
     });
   };
 
@@ -360,7 +409,7 @@ const Product = () => {
       });
 
       handleShow();
-    } catch (err) {}
+    } catch (err) { }
   };
 
   const searchProjectHandler = async (SearchBy, SearchVal) => {
@@ -371,7 +420,7 @@ const Product = () => {
         projects: result,
       });
       $("#page-content-wrapper .row").children().addClass("col-xl-4");
-    } catch (err) {}
+    } catch (err) { }
   };
 
   const viewProjectHandler = async (SearchBy, SearchVal) => {
@@ -382,16 +431,16 @@ const Product = () => {
         projects: result,
       });
       // $("#page-content-wrapper .row").children().addClass("col-xl-4");
-    } catch (err) {}
+    } catch (err) { }
   };
 
   const refreshPageHandler = () => {
     if ($("#sidebar-wrapper").is(":hidden")) {
-      getAllProject();
+      // getAllProject();
     } else {
       $("#sidebar-wrapper").toggle();
       $("#page-content-wrapper .row").children().toggleClass("col-xl-4");
-      getAllProject();
+      // getAllProject();
     }
   };
 
@@ -400,21 +449,23 @@ const Product = () => {
       const result = await getAllTemplateListApi();
       console.log("getAllTemplateList :: ", result);
       if (result.status == 200) {
-        setTemplateList(result.response);
+        setTemplateList(result.data);
       }
     } catch (error) {
       console.log("getAllTemplateList error :: ", error);
     }
   };
 
-  const onSelectTemplate = async (_templateId, _templateFile) => {
+  const onSelectTemplate = async (_templateId, _templateFile, _templateName) => {
     try {
-      console.log("onSelectTemplate :: ", _templateId, _templateFile);
+      console.log("onSelectTemplate :: ", _templateId, _templateFile, _templateName);
+      fileName = _templateName
       setTemplateId(_templateId);
+      setSelectTemplate(true)
       const res = await getTemplateMetaData(_templateFile);
       if (res.status == 200) {
         if (res.message.toLowerCase() === "file processed successfully")
-          console.log("getTemplateMetaData :: ", res.response);
+          console.log("getTemplateMetaData :: ", res.response, res.response.textFrames.id);
         setSelectedFileTextFrames(res.response.textFrames);
         // Update filePath in selections state
         setSelections((prevSelections) => ({
@@ -435,14 +486,28 @@ const Product = () => {
         creatorLastName: state.creatorLname,
         templateId: templateId,
       };
-      console.log("this is selection :: ", selections);
-      // let response = await createNewProjectApi(data);
-      // if (response.status == 201) {
-      //   if (
-      //     response.response.toLowerCase() === "project created successfully"
-      //   ) {
-      //     console.log("project created successfully");
-      //     let response = await genereateHtmlApi();
+      console.log("the data is::", data)
+      // const resp = await generatePdfApi(selections);
+      // console.log("this is selection :: ", resp);
+      // if(resp.status===200){
+      let response = await createNewProjectApi(data);
+      if (response.status == 201) {
+        if (
+          response.response.toLowerCase() === "project created successfully"
+
+        ) {
+          let res = await convertHtmlApi(response.data.file_name, response.data.project_name);
+          console.log("Convert to html:", res);
+          history.push('/edit-html', { fileName: response.data.file_name, fileNameTemaplate: response.data.project_name })
+        }
+      }
+      // }
+      // if (resp.status === 200) {
+      //   let response = await convertHtmlApi(resp.data, fileName);
+      //   console.log("The response of the convert html api is...:", response)
+      //   if (response.data) {
+
+      //     history.push('/edit-html', { fileName: resp.data, fileNameTemaplate: fileName })
       //   }
       // }
     } catch (error) {
@@ -450,10 +515,58 @@ const Product = () => {
     }
   };
 
+  const handlePdfs = async (index, event) => {
+    try {
+      const _worked = tempModificationsGlobal[0].map((_, index) =>
+        tempModificationsGlobal.map(innerArray => ({ ...innerArray[index] }))
+      );
+      console.log("worked", _worked);
+  
+      const generatePdfData = [];
+  
+      // Iterate through each subarray in _worked and send a separate API request
+      for (let i = 0; i < _worked.length; i++) {
+        const modificationSet = _worked[i];
+        const article = articles[i]; // Assuming articles and _worked have the same length
+  
+        const response = await axios.post("http://3.132.112.94:4000/api/update", {
+          modifications: modificationSet,
+          fileName: selections.filePath,
+          isDrupal: true,
+          articleTitle: article.title, // Add article title to the request
+        });
+  
+        console.log("Response from update API:", response.data);
+  
+        if (response.data) {
+          const data = {
+            arg1: article.title,
+          };
+  
+          console.log(data);
+  
+          generatePdfData.push(data);
+        }
+      }
+  
+      // Now call generatePdf once the loop is complete
+      for (const item of generatePdfData) {
+        const response = await generatePdf(item);
+        console.log("Response from generatePdf:", response);
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
+  };
+  
+  
+  // console.log("THe pdf selection is::", selections)
   const handleSelectChange = (index, event) => {
+    console.log("The HAndle change for textframe id is::", selectedFileTextFrames[index])
     const selectedArticle = articles.find(
       (article) => article.article_id === event.target.value
     );
+
     setSelections((prevSelections) => ({
       ...prevSelections,
       [index]: {
@@ -465,11 +578,77 @@ const Product = () => {
       },
     }));
   };
-  const saveSelections = async () => {
-    console.log("this is selections :: ", selections);
-    const resp = await generatePdfApi(selections);
-    // ... same as before ...
+  // const saveSelections = async () => {
+  //   console.log("this is selections :: ", selections);
+  //   const resp = await generatePdfApi(selections);
+  //   console.log("the resp is::",resp)
+  //   // ... same as before ...
+  // };
+
+
+  const handleDragStart = (event, title, contents) => {
+    console.log("the title is::",title,"Content is::",contents)
+    
+    event.dataTransfer.setData('text/plain', JSON.stringify({ title, contents }));
   };
+
+  const handleDragOver = (event) => {
+    event.preventDefault();
+  };
+
+  const handleDrop = (event, targetIndex) => {
+    event.preventDefault();
+  
+    const draggedData = JSON.parse(event.dataTransfer.getData('text/plain'));
+    const { contents, title } = draggedData;
+    console.log("title::", title);
+  
+    // Check if the title matches any attribute name in the articles
+    const matchingAttributes = Object.keys(articles[0]).filter(attribute =>
+      attribute.toLowerCase().includes(title.toLowerCase())
+    );
+  
+    // Create the desired array
+    const newObjects = matchingAttributes.flatMap(attribute =>
+      articles.map(article => ({
+        data_id: selectedFileTextFrames[targetIndex].data_id,
+        value: article[attribute]
+      }))
+    );
+  
+    // Convert newObjects into an array of sub-arrays
+    const subArrays = newObjects.map(obj => [obj]);
+  
+    // Update global variable
+    subArrays.forEach(subArray => {
+      const existingIndex = tempModificationsGlobal.findIndex(arr =>
+        arr.some(obj => obj.data_id === subArray[0].data_id)
+      );
+  
+      if (existingIndex === -1) {
+        // If data_id not found, add the new sub-array to the existing array
+        tempModificationsGlobal.push(subArray);
+      } else {
+        // If data_id found, add the new object to the existing sub-array
+        tempModificationsGlobal[existingIndex].push(subArray[0]);
+      }
+    });
+  
+    // Update the specific element in the array
+    const updatedTextFrames = [...selectedFileTextFrames];
+    updatedTextFrames[targetIndex] = { ...selectedFileTextFrames[targetIndex], contents };
+  
+    // Update state
+    setSelectedFileTextFrames(updatedTextFrames);
+  
+    console.log("The updated Text frames are...", updatedTextFrames);
+    console.log("The updated newObjects is...", newObjects);
+    console.log("The updated tempModifications are...", tempModificationsGlobal);
+   
+  };
+  
+  
+  
 
   return (
     <div>
@@ -532,10 +711,19 @@ const Product = () => {
                         System Manager{" "}
                       </Link>
                     </li>
+                    <li onClick={(someProp) => handleShow({ someProp: 'Drupal' })} className="nav-item">
+<a className="nav-link"
+                        href="javascript:void(0)">
+
+                      {" "}
+                      Drupal Integration{" "}
+                        </ a>
+
+                    </li>
                     <li className="nav-item">
-                      <Link className="nav-link" to={"/drupal"}>
-                        {" "}
-                        Drupal Integration{" "}
+                    <Link className="nav-link" to={"/upload"}>
+                      {" "}
+                      Upload Template{" "}
                       </Link>
                     </li>
                   </ul>
@@ -582,10 +770,16 @@ const Product = () => {
         >
           <div className="modal-content">
             <div className="modal-header">
+
               <h5 className="modal-title" id="staticBackdropLabel">
-                {state.projectPopupType == "Create"
-                  ? state.projectPopupType + " NEW PROJECT"
-                  : state.projectPopupType + " PROJECT"}
+                {isDrupal == true
+                  ? "Drupal Integration"
+                  : state.projectPopupType === "Create"
+                    ? "Create NEW PROJECT"
+                    : state.projectPopupType + " PROJECT"
+                }
+
+
               </h5>
 
               <button type="button" className="close" onClick={handleClose}>
@@ -637,7 +831,7 @@ const Product = () => {
                         />
                       </div>
                     </div>
-                    <div className="col-md-6">
+                    {/* <div className="col-md-6">
                       <div className="form-group">
                         <label for="exampleFormControlInput1">
                           Lead Lawyer
@@ -651,8 +845,8 @@ const Product = () => {
                           value={state.leadLawyerFname}
                         />
                       </div>
-                    </div>
-                    <div className="col-md-6">
+                    </div> */}
+                    {/* <div className="col-md-6">
                       <div className="form-group">
                         <label for="exampleFormControlInput1">&nbsp; </label>
                         <input
@@ -664,12 +858,16 @@ const Product = () => {
                           value={state.leadLawyerLname}
                         />
                       </div>
-                    </div>
-                    <div>
+                    </div> */}
+                    {/* <div>
                       {selectedFileTextFrames.map((textFrame, index) => (
-                        <div key={index}>
-                          <p>{textFrame.contents}</p>
-                          <select
+                        <div style={{ margin: '0.5rem' }} key={index}>
+                          <div style={{ display: 'flex' }}>
+                            <b>{`Text ${[index + 1]}:`}</b>
+
+                            <p style={{ flexWrap: 'wrap', paddingLeft: '0.5rem' }}>{textFrame.contents}</p>
+                          </div>
+                          <select style={{ marginTop: '-0.5rem' }}
                             value={selections[index]?.article_id || ""}
                             onChange={(event) =>
                               handleSelectChange(index, event)
@@ -687,8 +885,7 @@ const Product = () => {
                           </select>
                         </div>
                       ))}
-                      <button onClick={saveSelections}>Save Selections</button>
-                    </div>
+                    </div> */}
                     {/* <div className="col-md-12">
                       <div className="form-group">
                         <label for="exampleFormControlInput1">Office</label>
@@ -785,13 +982,17 @@ const Product = () => {
                           value={state.projectId}
                         />
                         <button
+                          style={{ cursor: !selectTemplate ? 'not-allowed' : 'pointer' }}
+                          disabled={!selectTemplate}
                           type="submit"
                           className="btn mb-2"
-                          onClick={() =>
+                          title={!selectTemplate ? 'Select a template first' : ''}
+                          onClick={() => isDrupal ?
+                            stephandleShow() :
                             onCreateNewProjectPressed()
-                          } /* onClick={stephandleShow}*/
+                          }
                         >
-                          {state.projectPopupType} Project
+                          Create Project
                         </button>
                         <button
                           type="submit"
@@ -813,7 +1014,7 @@ const Product = () => {
 
                   <div className="card">
                     <div className="card-body">
-                      {templateList.map((item, i) => (
+                      {templateList?.map((item, i) => (
                         <div
                           id={item.id}
                           // onClick={(e) =>
@@ -823,11 +1024,10 @@ const Product = () => {
                           //   })
                           // }
                           onClick={() =>
-                            onSelectTemplate(item.id, item.filename)
+                            onSelectTemplate(item.id, item.filepath, item.name)
                           }
-                          className={`${
-                            item.id == templateId ? "box Active" : "box"
-                          }`}
+                          className={`${item.id == templateId ? "box Active" : "box"
+                            }`}
                         >
                           <div className="thumbnail">
                             {item.image !== null ? (
@@ -854,11 +1054,12 @@ const Product = () => {
                             </a>
                           </div>
                           <div className="right-box">
-                            <div className="title">{item.name}</div>
-                            <p>Version 1.0.1</p>
-                            <a href="javascript:void(0)" className="btn">
+                            <div className="title">{item.template_name}</div>
+                            <p>Created Date : {item.created_at.substring(0, 10)}</p>
+                            <p>Version 1.0.0</p>
+                            {/* <a href="javascript:void(0)" className="btn">
                               View Template
-                            </a>
+                            </a> */}
                           </div>
                         </div>
                       ))}
@@ -894,313 +1095,55 @@ const Product = () => {
               <div className="row">
                 <div className="col-xl-4 col-sm-12 col-lg-4 col-md-12 col-xs-12">
                   <p>
-                    <b>Document Sections</b>
+                    <b>Indesign Sections</b>
                   </p>
                   <p>
-                    Click on a section to select it and allow the content panel
+                    Click on a section to select it and allow the drupal panel
                     to refresh with a possible content list based on that
                     selected section. Use the button to delete, pre- view and
                     reorder the content in your sections.
                   </p>
                   <div className="accordion" id="accordionExample">
-                    <div className="card">
-                      <div className="card-header" id="headingOne">
-                        <h2 className="mb-0">
-                          <button
-                            className="btn btn-link btn-block text-left"
-                            type="button"
-                            data-toggle="collapse"
-                            data-target="#collapseOne"
-                            aria-expanded="true"
-                            aria-controls="collapseOne"
-                          >
-                            Section 01
-                          </button>
-                        </h2>
-                      </div>
+                    {selectedFileTextFrames.map((textFrame, index) => (
+                      <div className="card" key={index}>
+                        <div className="card-header" id={`heading${index}`}>
+                          <h2 className="mb-0">
+                            <button
+                              className="btn btn-link btn-block text-left"
+                              type="button"
+                              data-toggle={`collapse${index}`}
+                              data-target={`#collapse${index}`}
+                              aria-expanded="true"
+                              aria-controls={`collapse${index}`}
+                            >
 
-                      <div
-                        id="collapseOne"
-                        className="collapse show"
-                        aria-labelledby="headingOne"
-                        data-parent="#accordionExample"
-                      >
-                        <div className="card-body">
-                          <ul>
-                            <li>
-                              - Why Renlaw in the US ?
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-file"></i>
-                              </a>
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-chevron-circle-up"></i>
-                              </a>
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-chevron-circle-down"></i>
-                              </a>
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-trash-o"></i>
-                              </a>
-                            </li>
-                            <li>
-                              - Map of US
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-file"></i>
-                              </a>
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-chevron-circle-up"></i>
-                              </a>
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-chevron-circle-down"></i>
-                              </a>
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-trash-o"></i>
-                              </a>
-                            </li>
+                              Text {index + 1}: {textFrame.title}
+                            </button>
+                          </h2>
+                        </div>
 
-                            <li>
-                              - Office List
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-file"></i>
-                              </a>
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-chevron-circle-up"></i>
-                              </a>
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-chevron-circle-down"></i>
-                              </a>
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-trash-o"></i>
-                              </a>
-                            </li>
-                          </ul>
+                        <div
+                          id={`collapse${index}`}
+                          className="collapse show"
+                          aria-labelledby={`heading${index}`}
+                          data-parent="#accordionExample"
+                          onDragOver={(event) => handleDragOver(event)}
+                          onDrop={(event) => handleDrop(event, index)}
+                        >
+                          <div className="card-body">
+                            <ul>
+                              <li>{textFrame.contents}</li>
+                            </ul>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div className="card">
-                      <div className="card-header" id="headingTwo">
-                        <h2 className="mb-0">
-                          <button
-                            className="btn btn-link btn-block text-left collapsed"
-                            type="button"
-                            data-toggle="collapse"
-                            data-target="#collapseTwo"
-                            aria-expanded="false"
-                            aria-controls="collapseTwo"
-                          >
-                            Section 02
-                          </button>
-                        </h2>
-                      </div>
-                      <div
-                        id="collapseTwo"
-                        className="collapse"
-                        aria-labelledby="headingTwo"
-                        data-parent="#accordionExample"
-                      >
-                        <div className="card-body">
-                          <ul>
-                            <li>
-                              - Why Renlaw in the US ?
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-file"></i>
-                              </a>
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-chevron-circle-up"></i>
-                              </a>
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-chevron-circle-down"></i>
-                              </a>
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-trash-o"></i>
-                              </a>
-                            </li>
-                            <li>
-                              - Map of US
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-file"></i>
-                              </a>
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-chevron-circle-up"></i>
-                              </a>
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-chevron-circle-down"></i>
-                              </a>
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-trash-o"></i>
-                              </a>
-                            </li>
+                    ))}
 
-                            <li>
-                              - Office List
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-file"></i>
-                              </a>
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-chevron-circle-up"></i>
-                              </a>
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-chevron-circle-down"></i>
-                              </a>
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-trash-o"></i>
-                              </a>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="card">
-                      <div className="card-header" id="headingThree">
-                        <h2 className="mb-0">
-                          <button
-                            className="btn btn-link btn-block text-left collapsed"
-                            type="button"
-                            data-toggle="collapse"
-                            data-target="#collapsethree"
-                            aria-expanded="false"
-                            aria-controls="collapsethree"
-                          >
-                            Section 03
-                          </button>
-                        </h2>
-                      </div>
-                      <div
-                        id="collapsethree"
-                        className="collapse"
-                        aria-labelledby="headingThree"
-                        data-parent="#accordionExample"
-                      >
-                        <div className="card-body">
-                          <ul>
-                            <li>
-                              - Why Renlaw in the US ?
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-file"></i>
-                              </a>
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-chevron-circle-up"></i>
-                              </a>
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-chevron-circle-down"></i>
-                              </a>
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-trash-o"></i>
-                              </a>
-                            </li>
-                            <li>
-                              - Map of US
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-file"></i>
-                              </a>
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-chevron-circle-up"></i>
-                              </a>
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-chevron-circle-down"></i>
-                              </a>
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-trash-o"></i>
-                              </a>
-                            </li>
-
-                            <li>
-                              - Office List
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-file"></i>
-                              </a>
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-chevron-circle-up"></i>
-                              </a>
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-chevron-circle-down"></i>
-                              </a>
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-trash-o"></i>
-                              </a>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="card">
-                      <div className="card-header" id="headingFour">
-                        <h2 className="mb-0">
-                          <button
-                            className="btn btn-link btn-block text-left collapsed"
-                            type="button"
-                            data-toggle="collapse"
-                            data-target="#collapseFour"
-                            aria-expanded="false"
-                            aria-controls="collapseFour"
-                          >
-                            Section 04
-                          </button>
-                        </h2>
-                      </div>
-                      <div
-                        id="collapseFour"
-                        className="collapse"
-                        aria-labelledby="headingThree"
-                        data-parent="#accordionExample"
-                      >
-                        <div className="card-body">
-                          <ul>
-                            <li>
-                              - Why Renlaw in the US ?
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-file"></i>
-                              </a>
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-chevron-circle-up"></i>
-                              </a>
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-chevron-circle-down"></i>
-                              </a>
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-trash-o"></i>
-                              </a>
-                            </li>
-                            <li>
-                              - Map of US
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-file"></i>
-                              </a>
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-chevron-circle-up"></i>
-                              </a>
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-chevron-circle-down"></i>
-                              </a>
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-trash-o"></i>
-                              </a>
-                            </li>
-
-                            <li>
-                              - Office List
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-file"></i>
-                              </a>
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-chevron-circle-up"></i>
-                              </a>
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-chevron-circle-down"></i>
-                              </a>
-                              <a href="javascript:void(0)">
-                                <i className="fa fa-trash-o"></i>
-                              </a>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
                   </div>
                 </div>
                 <div className="col-xl-5 col-sm-12 col-lg-5 col-md-12 col-xs-12">
                   <p>
-                    <b>Content Panel</b>
+                    <b>Drupal Panel</b>
                   </p>
                   <p>
                     Drag and drop the content below to your decument sections.
@@ -1224,7 +1167,7 @@ const Product = () => {
                             aria-expanded="true"
                             aria-controls="collapsepanel-1"
                           >
-                            Firm Overviews
+                            Drupal Data
                           </button>
                         </h2>
                       </div>
@@ -1237,7 +1180,60 @@ const Product = () => {
                       >
                         <div className="card-body">
                           <div className="accordion" id="accordionExample">
+
                             <div className="card">
+                              <div className="card-header" id="headingpanel-1-inner">
+                                <h2 className="mb-0">
+                                  <button
+                                    className="btn btn-link btn-block text-left"
+                                    type="button"
+                                    data-toggle="collapse"
+                                    data-target="#collapsepanel-1-inner"
+                                    aria-expanded="true"
+                                    aria-controls="collapsepanel-1-inner"
+                                  >
+                                    {articles[0]?.title}
+                                  </button>
+                                </h2>
+                              </div>
+
+                              <div
+
+                                id="collapsepanel-1-inner"
+                                className="collapse show"
+                                aria-labelledby="headingpanel-1-inner"
+                                data-parent="#accordionExample"
+                              >
+                                <div className="card-body">
+                                  <ul>
+                                    <li
+                                      draggable
+                                      onDragStart={(event) => handleDragStart(event, 'title', articles[0]?.title)}
+                                      onDragOver={handleDragOver}
+                                      onDrop={(event) => handleDrop(event, 0)}
+                                    >
+                                      <strong>Title:</strong> {articles[0]?.title}
+                                    </li>
+                                    <li draggable
+                                      onDragStart={(event) => handleDragStart(event, 'body', articles[0]?.body)}
+                                      onDragOver={handleDragOver}
+                                      onDrop={(event) => handleDrop(event, 1)}>
+                                      <strong>Body:</strong> {articles[0]?.body}
+                                    </li>
+                                    <li draggable
+                                      onDragStart={(event) => handleDragStart(event, 'field_genre', articles[0]?.field_genre)}
+                                      onDragOver={handleDragOver}
+                                      onDrop={(event) => handleDrop(event, 2)}>
+                                      <strong>File Genre:</strong> {articles[0]?.field_genre}
+                                    </li>
+                                  </ul>
+                                </div>
+                              </div>
+                            </div>
+
+
+
+                            {/* <div className="card">
                               <div className="card-header" id="headingOne">
                                 <h2 className="mb-0">
                                   <button
@@ -1330,7 +1326,7 @@ const Product = () => {
                                   </ul>
                                 </div>
                               </div>
-                            </div>
+                            </div> */}
                           </div>
                         </div>
                       </div>
@@ -1338,7 +1334,7 @@ const Product = () => {
                   </div>
                 </div>
                 <div className="col-xl-3 col-sm-12 col-lg-3 col-md-12 col-xs-12 projectstep2">
-                  <button
+                  {/* <button
                     type="submit"
                     className="btn mb-2"
                     onClick={handleShow}
@@ -1350,7 +1346,8 @@ const Product = () => {
                   </button>
                   <button
                     type="submit"
-                    className="btn mb-2" /* onClick={mySubmitHandler}*/
+                    className="btn mb-2"
+                 
                   >
                     <Link
                       to={{
@@ -1364,6 +1361,26 @@ const Product = () => {
                     >
                       {" "}
                       Generate Project{" "}
+                    </Link>
+                  </button> */}
+                  <br />
+                  <button
+                    type="submit"
+                    className="btn mb-2"
+                    onClick={() => handlePdfs()}
+                  >
+                    <Link
+                      to={{
+                        // pathname: "/layoutedit",
+                        templatesProps: {
+                          projectName: `${state.projectName}`,
+                          layoutName: `${state.productLayoutName}`,
+                          projectId: `${state.projectId}`,
+                        },
+                      }}
+                    >
+                      {" "}
+                      Generate Pdfs{" "}
                     </Link>
                   </button>
                   <br />
@@ -1609,9 +1626,9 @@ const Product = () => {
                 </div>
               </div>
 
-              <div id="page-content-wrapper">
+              <div style={{marginTop:'1rem'}} id="page-content-wrapper">
                 <div className="row">
-                  {state.projects.map((item, j) => (
+                  {/* {state.projects.map((item, j) => (
                     <ProductCard
                       item={item}
                       previewHandler={previewHandler}
@@ -1620,6 +1637,65 @@ const Product = () => {
                       settingHandler={settingHandler}
                       changeStatusHandler={changeStatusHandler}
                     />
+                  ))} */}
+                  {projectList.map((item, i) => (
+                    <ProductCard
+                      key={i}
+                      item={item.id}
+                      previewHandler={previewHandler}
+                      deleteHandler={deleteHandler}
+                      projectEditHandler={projectEditHandler}
+                      settingHandler={settingHandler}
+                      changeStatusHandler={changeStatusHandler}
+                      imageTemplate={[item.image ,item.created_at, item.project_name, item.creator_first_name,item.creator_last_name]}
+                    />
+                    // <div
+                    //   id={item.id}
+                    //   // onClick={(e) =>
+                    //   //   setState({
+                    //   //     selectedTemplateId: item.templateId,
+                    //   //     layoutName: item.layoutName,
+                    //   //   })
+                    //   // }
+                    //   // onClick={() =>
+                    //   //   onSelectTemplate(item.id, item.filename,item.name)
+                    //   // }
+                    //   className={`${
+                    //     item.id == templateId ? "box Active" : "box"
+                    //   }`}
+                    // >
+                    //   <div className="thumbnail">
+                    //     {item.image !== null ? (
+                    //       <img
+                    //         className="thumb"
+                    //         // src={config.IMG_URL + "" + item.templateImage}
+                    //         src={item.image}
+                    //         alt=""
+                    //         width="129"
+                    //       />
+                    //     ) : (
+                    //       <img
+                    //         className="thumb"
+                    //         src={homeImg}
+                    //         alt=""
+                    //         width="129"
+                    //       />
+                    //     )}
+                    //     <a
+                    //       className="thumbPreview"
+                    //       href="javascript:void(0)"
+                    //     >
+                    //       <img src={thumbnailPreviewImg} alt="" />
+                    //     </a>
+                    //   </div>
+                    //   <div className="right-box">
+                    //     <div className="title">{item.name}</div>
+                    //     <p>Version 1.0.1</p>
+                    //     <a href="javascript:void(0)" className="btn">
+                    //       View Template
+                    //     </a>
+                    //   </div>
+                    // </div>
                   ))}
                 </div>
               </div>

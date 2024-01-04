@@ -2,7 +2,8 @@ import resolve from "./resolve";
 import axios from "axios";
 import { ApiName } from "../Utils/ApiName";
 let apiBase = "/";
-let localApiBase = "http://localhost:4000/api";
+// let localApiBase = "http://localhost:4000/api";
+let localApiBase = "http://3.132.112.94:4000/api";
 export const fetchAllProject = async () => {
   return await resolve(
     axios.get(apiBase + "getAllProjectList").then((res) => res.data)
@@ -193,6 +194,7 @@ export const articlesList = async (req) => {
 };
 
 export const generatePdf = async (item) => {
+  // console.log("generatePdfs",item)
   return await axios({
     url: `${localApiBase}/generatePdfs`,
     method: "POST",
@@ -216,7 +218,11 @@ export const getAllTemplateListApi = async (req) => {
     axios.get(localApiBase + ApiName.templateList, req).then((res) => res.data)
   );
 };
-
+export const getAllProjecstList = async (req) => {
+  return await resolve(
+    axios.get(localApiBase + ApiName.allprojectsList, req).then((res) => res.data)
+  );
+};
 export const createNewProjectApi = async (req) => {
   return await resolve(
     axios
@@ -228,6 +234,13 @@ export const createNewProjectApi = async (req) => {
 export const genereateHtmlApi = async (req) => {
   return await resolve(
     axios.post(localApiBase + ApiName.generateHtml, req).then((res) => res.data)
+  );
+};
+
+export const convertHtmlApi = async (req,fileName) => {
+  console.log("the api is....",req)
+  return await resolve(
+    axios.post(localApiBase + ApiName.convertHtml, {name:req,fileName:fileName}).then((res) => res.data)
   );
 };
 
@@ -244,5 +257,11 @@ export const getTemplateMetaData = async (filePath) => {
 export const generatePdfApi = async (selections) => {
   return await axios
     .post(localApiBase + ApiName.generatePdf, { args: selections })
+    .then((res) => res.data);
+};
+
+export const createThumbnails = async (selections) => {
+  return await axios
+    .post(localApiBase + ApiName.createThumbnails, { args: selections })
     .then((res) => res.data);
 };

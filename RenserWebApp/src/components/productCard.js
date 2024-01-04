@@ -14,7 +14,10 @@ const ProductCard = ({
   projectEditHandler,
   settingHandler,
   changeStatusHandler,
+  imageTemplate
 }) => {
+  const [image,created_at, name, creator_first_name,creator_last_name] = imageTemplate;
+
   return (
     <div className="col-xl-3 col-sm-12 col-lg-6 col-md-12 col-xs-12">
       <div className="card">
@@ -50,8 +53,8 @@ const ProductCard = ({
               {item.projectName}
             </Link>
           </h5>
-          <div className="latest-update">Created Date: {item.created}</div>
-          <div className="latest-update">Last Updated: {item.modified}</div>
+          <div className="latest-update">Created Date: {created_at.substring(0, 10)}</div>
+          {/* <div className="latest-update">Last Updated: {item.modified}</div> */}
           <div className="status">
             Status:{" "}
             {`${
@@ -73,16 +76,12 @@ const ProductCard = ({
               {item.productImage != null ? (
                 <img
                   className="thumb"
-                  src={
-                    "https://rensera.live/renseraapi/assets/thumb/" +
-                    "" +
-                    item.productImage
-                  }
+                  src=''
                   alt=""
                   width="129"
                 />
               ) : (
-                <img className="thumb" src={homeImg} alt="" width="129" />
+                <img className="thumb" src={image} alt="" width="129" />
               )}
               <a className="thumbPreview" href="javascript:void(0)">
                 <img
@@ -95,12 +94,13 @@ const ProductCard = ({
 
             <div className="right-part">
               <ul>
-                <li>Team: {item.teamName}</li>
+                {/* <li>Team: {item.teamName}</li> */}
                 <li>
-                  Creator: {item.creatorFname} {item.creatorLname}
+                  Creator: {creator_first_name} {creator_last_name}
                 </li>
-                <li>Template: {item.templateName}</li>
-                <li>Version: {item.version}</li>
+                <li>Template: {name}</li>
+                {/* <li>Description: {description}</li> */}
+                <li>Version: V:1.0.1</li>
               </ul>
               <div className="button-section">
                 <a
@@ -120,7 +120,7 @@ const ProductCard = ({
                   onClick={() => {
                     projectEditHandler(item.projectId, "copy");
                   }}
-                  /* onClick={() => {if(window.confirm('Are you sure to copy this project?')){ copyHandler(item.projectId)};}} */ title="create-new-project"
+                  // /* onClick={() => {if(window.confirm('Are you sure to copy this project?')){ copyHandler(item.projectId)};}} */ title="create-new-project"
                 >
                   <img src={cloneIconImg} className="action-icon" />
                 </a>

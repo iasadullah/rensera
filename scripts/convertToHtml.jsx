@@ -1,5 +1,11 @@
 ﻿#include "json2.js"
-function main(inputPath, outputPath, mappingPath) {
+
+var fileName = app.scriptArgs.getValue("arg1");
+var fileNameTemaplate = app.scriptArgs.getValue("fileName");
+
+$.writeln("fileNam<><><><><><><>e" + fileName, fileNameTemaplate);
+
+function main(inputPath, outputFolderPath, mappingPath) {
   var myFile = new File(inputPath);
   var folderExists = true;
   var result = "";
@@ -8,6 +14,14 @@ function main(inputPath, outputPath, mappingPath) {
   if (!myFile.exists) {
     result = "The file does not exist: " + inputPath;
     return result;
+  }
+
+  // Create a folder with the fileNameTemaplate
+  var outputFolder = new Folder(outputFolderPath + fileNameTemaplate);
+
+  // Check if the folder already exists, create it if not
+  if (!outputFolder.exists) {
+    outputFolder.create();
   }
 
   // Open the document
@@ -30,13 +44,14 @@ function main(inputPath, outputPath, mappingPath) {
     epubPageRangeFormat = PageRangeFormat.EXPORT_ALL_PAGES;
   }
 
-  myDoc.exportFile(ExportFormat.HTMLFXL, new File(outputPath));
+  var htmlFile = new File(outputFolder + "/output.html");
+  myDoc.exportFile(ExportFormat.HTMLFXL, htmlFile);
 
   // Close the document
   myDoc.close();
 
   // Save the mapping to a file
-  var mappingFile = new File(mappingPath);
+  var mappingFile = new File(outputFolder + "/mapping.json");
   mappingFile.open('w');
   mappingFile.write(JSON.stringify(mapping));
   mappingFile.close();
@@ -44,9 +59,17 @@ function main(inputPath, outputPath, mappingPath) {
   return "Successful";
 }
 
-// The input, output, and mapping paths
-var inputPath = "C:/Users/sulem/Desktop/Demo/server/uploads/template.indt";
-var outputPath = "C:/Users/sulem/Desktop/Demo/server/generatedHtml/output.html";
-var mappingPath = "C:/Users/sulem/Desktop/Demo/server/generatedHtml/mapping.json";
+var configFile = File("C:/Users/Administrator/Desktop/rensera/scripts/config.json");
+configFile.open("r");
+var configData = configFile.read();
+configFile.close();
 
-main(inputPath, outputPath, mappingPath);
+// Parse the JSON data
+var config = JSON.parse(configData);
+
+// The input, output, and mapping paths
+var inputPath = fileName;
+var outputFolderPath = config.outputUpdated;
+var mappingPath = config.outputPathHTml + "mapping.json";
+
+main(inputPath, outputFolderPath, mappingPath);

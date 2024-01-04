@@ -35,14 +35,19 @@ if (myFile.exists) {
 
   // Initialize a counter for the text frame IDs
   var textFrameId = 1;
-
+  var mapping = {};
   // Loop through all text frames in the document
   for (var i = 0; i < myDoc.textFrames.length; i++) {
     var myTextFrame = myDoc.textFrames[i];
+    $.writeln("COntent"+myTextFrame.contents)
+        $.writeln("COntent ID::"+myTextFrame.id)
+    mapping[i] = myTextFrame.id;
     var textFrameData = {
       id: textFrameId++, // Assign the current value of the counter as the ID and then increment the counter
       contents: myTextFrame.contents,
-      geometricBounds: myTextFrame.geometricBounds
+      geometricBounds: myTextFrame.geometricBounds,
+      data_id:mapping[i]
+     
     };
     result.textFrames.push(textFrameData);
   }
