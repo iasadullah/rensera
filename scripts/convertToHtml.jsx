@@ -1,9 +1,14 @@
 ﻿#include "json2.js"
-
+function trimString(inputString) {
+  return inputString.replace(/^\s+|\s+$/g, "");
+}
 var fileName = app.scriptArgs.getValue("arg1");
 var fileNameTemaplate = app.scriptArgs.getValue("fileName");
 
-$.writeln("fileNam<><><><><><><>e" + fileName, fileNameTemaplate);
+// Trim any leading or trailing spaces in fileName
+fileName = trimString(fileName);
+
+$.writeln("fileNam<><><><><><><>e" + fileName,+"fileNameTemaplate"+ fileNameTemaplate);
 
 function main(inputPath, outputFolderPath, mappingPath) {
   var myFile = new File(inputPath);
@@ -28,7 +33,7 @@ function main(inputPath, outputFolderPath, mappingPath) {
   var myDoc = app.open(myFile);
 
   // The mapping between the HTML elements and the InDesign elements
-  var mapping = {};
+  var mapping = [];
 
   // Add a unique identifier to each text frame
   for (var i = 0; i < myDoc.textFrames.length; i++) {
@@ -36,7 +41,9 @@ function main(inputPath, outputFolderPath, mappingPath) {
     textFrame.label = i.toString(); // Use the index as the identifier
 
     // Add the mapping between the HTML data-id and the InDesign ID
-    mapping[i] = textFrame.id;
+    //mapping[i] ={ id:textFrame.id,content: textFrame.contents};
+    
+    mapping.push({ id:textFrame.id,content: textFrame.contents})
   }
 
   // Export the document to FXL HTML
@@ -49,7 +56,8 @@ function main(inputPath, outputFolderPath, mappingPath) {
 
   // Close the document
   myDoc.close();
-
+  myDoc = null; // Release the reference
+  $.sleep(100); // Wait for resources to be released
   // Save the mapping to a file
   var mappingFile = new File(outputFolder + "/mapping.json");
   mappingFile.open('w');
@@ -68,7 +76,7 @@ configFile.close();
 var config = JSON.parse(configData);
 
 // The input, output, and mapping paths
-var inputPath = fileName;
+var inputPath = fileName + "\\" + fileNameTemaplate + ".indd";
 var outputFolderPath = config.outputUpdated;
 var mappingPath = config.outputPathHTml + "mapping.json";
 

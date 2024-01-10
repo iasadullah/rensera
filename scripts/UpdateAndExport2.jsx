@@ -1,9 +1,10 @@
 ﻿#include "json2.js"
 
 function main() {
+    $.writeln("update and export 2");
     var allArguments = app.scriptArgs.getValue("allArguments");
     $.writeln("allArguments" + allArguments);
-var inputPath = app.scriptArgs.getValue("fileName");
+    var inputPath = app.scriptArgs.getValue("fileName");
     $.writeln("inputPath" + inputPath);
     var outputPaths = app.scriptArgs.getValue("outputPath");
     $.writeln("outputPath" + outputPaths);
@@ -11,7 +12,7 @@ var inputPath = app.scriptArgs.getValue("fileName");
     $.writeln("indesignName" + indesignName);
     // Ensure outputPaths ends with a backslash
     outputPaths = outputPaths + (outputPaths.charAt(outputPaths.length - 1) === "\\" ? "" : "\\");
-    
+
     $.writeln("outputPath" + outputPaths);
     // Parse XML string to XML object
     var xmlData = new XML(allArguments);
@@ -50,7 +51,7 @@ var inputPath = app.scriptArgs.getValue("fileName");
     //var inputPath = "C:/Users/sulem/Desktop/Demo/server/uploads/Business Proposal.indd";
     var outputPath = "C:/Users/Administrator/Desktop/";
 
-    var myFile = new File(inputPath);
+    var myFile = new File(inputPath + "\\" + indesignName + ".indd"); // Construct inputPath
     var result = "";
 
     // Check if the file exists
@@ -73,13 +74,13 @@ var inputPath = app.scriptArgs.getValue("fileName");
                 $.writeln("Matched " + myTextFrame.id + " " + dataItem.data_id);
                 myTextFrame.contents = dataItem.value;
             }
-        //else {
-               //$.writeln("Not matched " + myTextFrame.id + " " + dataItem.data_id);
-//}
+            //else {
+            //$.writeln("Not matched " + myTextFrame.id + " " + dataItem.data_id);
+            //}
         }
     }
 
-   // Save the document
+    // Save the document with the specified indesignName in the same directory
 var outputDirectory = new Folder(outputPaths);
 outputDirectory.create(); // Create the directory if it doesn't exist
 

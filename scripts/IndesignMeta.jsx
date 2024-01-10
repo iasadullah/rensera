@@ -2,7 +2,7 @@
 
 function main(){
 var fileName = app.scriptArgs.getValue("arg1");
-$.writeln("fileName" + fileName);
+//$.writeln("fileName" + fileName);
 
 var myFile = new File( fileName);
 var result = {};
@@ -39,8 +39,8 @@ if (myFile.exists) {
   // Loop through all text frames in the document
   for (var i = 0; i < myDoc.textFrames.length; i++) {
     var myTextFrame = myDoc.textFrames[i];
-    $.writeln("COntent"+myTextFrame.contents)
-        $.writeln("COntent ID::"+myTextFrame.id)
+    // $.writeln("COntent"+myTextFrame.contents)
+    //     $.writeln("COntent ID::"+myTextFrame.id)
     mapping[i] = myTextFrame.id;
     var textFrameData = {
       id: textFrameId++, // Assign the current value of the counter as the ID and then increment the counter
@@ -75,5 +75,7 @@ if (myFile.exists) {
   result.error = "File not found.";
   $.writeln(result.error);
 }
+$.writeln("result string::"+resultString);
+
 return resultString;}
 main();

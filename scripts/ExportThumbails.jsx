@@ -3,10 +3,36 @@
 // An InDesign Server JavaScript
 // Opens all existing documents in a specific folder and generates one thumbnail of the first page for each document.
 function main(){
-  var fileName = app.scriptArgs.getValue("arg1");
-  var filePath=fileName.replace(/[^\\\/]+$/, '');
-  $.writeln("The file name  is...:"+ filePath)
-  
+var fileName = app.scriptArgs.getValue("arg1");
+var filePath 
+// Check if the file name ends with a specific extension
+var supportedExtensions = ['.indt', '.indd', '.idml'];
+var hasExtension = false;
+
+for (var i = 0; i < supportedExtensions.length; i++) {
+  var extension = supportedExtensions[i];
+  if (fileName.toLowerCase().slice(-extension.length) === extension) {
+    hasExtension = true;
+    break;
+  }
+}
+
+// If the file name has an extension, remove it; otherwise, leave it as is
+if (hasExtension) {
+  // Remove the extension from the file name
+  fileName = fileName.replace(/[^\\\/]+$/, '');
+
+  // Remove the last element (file name) from the file path
+  filePath = fileName.replace(/[^\\\/]+$/, '');
+}
+
+
+
+        $.writeln("File Name of remove extensions is....." + fileName);
+                $.writeln("File PAth  of remove extensions is....." + filePath);
+
+// Now 'filePath' and 'fileName' contain the desired values based on your conditions
+
   var configFile = File("C:/Users/Administrator/Desktop/rensera/scripts/config.json");
   configFile.open("r");
   var configData = configFile.read();
@@ -16,9 +42,9 @@ function main(){
   
   
   
-  var folderPath = filePath; // Specify the folder path containing your InDesign files
-  var pdfFilePath = filePath;
-  var thumbnailsPath = filePath;
+  var folderPath = fileName+"/"; // Specify the folder path containing your InDesign files
+  var pdfFilePath = fileName+"/";
+  var thumbnailsPath = fileName+"/";
   
   var fileList = [];
   var folder = new Folder(folderPath);
@@ -59,7 +85,7 @@ function main(){
         $.writeln("List is....." + namesList);
    //namesList.push(myFile.name);
         // Create a thumbnail of the first page
-        var thumbnailFileName = myFile.name.replace(/\.indt$/, '')
+        var thumbnailFileName = myFile.name.replace(/\.(indt|indd)$/, '')
         + ".jpg"; // Change the file format if needed
         var thumbnailPath = newFolder + "/" + thumbnailFileName;
         var thumbnailFile = new File(thumbnailPath);
@@ -135,8 +161,8 @@ function main(){
             now.getMilliseconds() + 'Z';
           // Export the first page as a PNG
           var pngFilePath = new File(
-            newFolder + "/" +  myFile.name.replace(/\.(indt|indd)$/, '')+ ".png"
-          );
+            newFolder + "/" +  myFile.name.replace(/\.(indt|indd)$/, '') + ".png"
+        );
           pdfRect.exportFile(ExportFormat.PNG_FORMAT, pngFilePath);
         }
   
