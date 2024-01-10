@@ -3,14 +3,16 @@ import "../assets/css/style.css";
 import '@fortawesome/fontawesome-free/css/all.min.css'; // Import Font Awesome CSS
 
 import axios from "axios";
-import { useLocation } from "react-router-dom/cjs/react-router-dom.min";
+import { useHistory, useLocation } from "react-router-dom/cjs/react-router-dom.min";
 import { generatePdf } from "../services/api";
+import Loading from "../components/Loading";
 let modification = [];
 
 const EditHtml = () => {
+  const history=useHistory()
   const location = useLocation()
   const stateData = location?.state;
-  console.log("THe file name is...", stateData?.fileNameTemaplate)
+  console.log("THe file name is...", stateData)
 
   const apiUrlOfServer = process.env.REACT_APP_API_URL;
   const iframeRef = useRef(null);
@@ -18,6 +20,7 @@ const EditHtml = () => {
   const [isFileUploaded, setIsFileUploaded] = useState(false);
   const [isToolbarVisible, setIsToolbarVisible] = useState(false);
   const [selectedText, setSelectedText] = useState('');
+  const [loading, setLoading] = useState(false);
   // const [html, setHtml] = useState("");
   const [mapping, setMapping] = useState({});
   const [selectedColor, setSelectedColor] = useState('#000000'); // Default color is black
@@ -154,12 +157,15 @@ setSelectedText(initialText)
   };
   const handleSaveClick = async (modifiedText) => {
     try {
-      console.log("The modified all text is:", modification);
+      setLoading(true)
+      console.log("The modified all text is:", modification,stateData);
 
       // Send the modifications array to the server
-      const response = await axios.post("http://3.132.112.94:4000/api/update", {
+      const response = await axios.post("http://3.132.112.94:4000/api/updateHome", {
         modifications: modification,
-        fileName: stateData.fileName
+        fileName: stateData.fileName,
+        outputPath:stateData?.fileName,
+        indesignName:stateData?.fileNameTemaplate
       });
 
       console.log("Server response:", response.data);
@@ -167,8 +173,12 @@ setSelectedText(initialText)
         // const result = await generatePdf()
         // console.log("Result is ::", result)
       }
+      setLoading(false)
+      history.push('/home')
       // Handle the response as needed
     } catch (error) {
+      setLoading(false)
+
       console.error("Error saving modifications:", error);
 
       // Handle errors
@@ -177,7 +187,11 @@ setSelectedText(initialText)
 
   return (
     <div >
-      {
+    {
+      loading&&<Loading/>
+    }
+     
+        {
         isToolbarVisible && (
           <div style={{ position: 'absolute', right: '5', top: '5rem', zIndex: '1000',width:'30%' }} className="toolbar">
             <b>Original Text</b>

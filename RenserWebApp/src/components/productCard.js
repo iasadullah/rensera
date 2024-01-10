@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import starIconImg from "../assets/images/star-icon.png";
 import cloneIconImg from "../assets/images/clone-icon.png";
 import settingIconImg from "../assets/images/settings-icon.png";
@@ -6,6 +6,9 @@ import trashIconImg from "../assets/images/trash-can-icon.png";
 import { Link } from "react-router-dom";
 import homeImg from "../assets/images/home-img-01.d60eb4b9.png";
 import thumbnailPreviewImg from "../assets/images/thumbnail-preview-overlay.png";
+import { convertHtmlApi } from "../services/api";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import Loading from "./Loading";
 
 const ProductCard = ({
   item,
@@ -14,25 +17,33 @@ const ProductCard = ({
   projectEditHandler,
   settingHandler,
   changeStatusHandler,
-  imageTemplate
+  projectData
 }) => {
-  const [image,created_at, name, creator_first_name,creator_last_name] = imageTemplate;
+  const history=useHistory()
+  const [loading,setLoading]=useState(false)
+  // const [image,created_at, name, creator_first_name,creator_last_name] = projectData;
+  // console.log("The image Tamplate is::",projectData)
+const handleClick=async(project_name,file_name)=>{
+setLoading(true)
+  console.log("pojectName ::",project_name,file_name)
+  let res = await convertHtmlApi(file_name,project_name);
+          console.log("Convert to html:", res);
+setLoading(false)
 
+          history.push('/edit-html', { fileName: file_name, fileNameTemaplate:project_name })
+}
   return (
+    
     <div className="col-xl-3 col-sm-12 col-lg-6 col-md-12 col-xs-12">
+      {
+        loading&&<Loading/>
+      }
       <div className="card">
         <div className="card-body">
           <h5 className="card-title">
-            <Link
+            <div
               className="upload-btn"
-              to={{
-                pathname: "/layoutedit",
-                templatesProps: {
-                  projectName: `${item.projectName}`,
-                  layoutName: `${item.productLayoutName}`,
-                  projectId: `${item.projectId}`,
-                },
-              }}
+              onClick={()=>handleClick(item.project_name,item.filepath)}
               style={{
                 color: `${
                   item.projectStatus == 1
@@ -48,12 +59,13 @@ const ProductCard = ({
                     : ""
                 }`,
                 fontWeight: "bold",
+                cursor:'pointer'
               }}
             >
-              {item.projectName}
-            </Link>
+              {item?.project_name}
+            </div>
           </h5>
-          <div className="latest-update">Created Date: {created_at.substring(0, 10)}</div>
+          <div className="latest-update">Created Date: {item?.created_at.substring(0, 10)}</div>
           {/* <div className="latest-update">Last Updated: {item.modified}</div> */}
           <div className="status">
             Status:{" "}
@@ -81,13 +93,13 @@ const ProductCard = ({
                   width="129"
                 />
               ) : (
-                <img className="thumb" src={image} alt="" width="129" />
+                <img className="thumb" src={item?.image} alt="" width="129" />
               )}
               <a className="thumbPreview" href="javascript:void(0)">
                 <img
                   src={thumbnailPreviewImg}
                   alt=""
-                  onClick={previewHandler}
+                  onClick={()=>previewHandler(item?.image)}
                 />
               </a>
             </div>
@@ -96,20 +108,20 @@ const ProductCard = ({
               <ul>
                 {/* <li>Team: {item.teamName}</li> */}
                 <li>
-                  Creator: {creator_first_name} {creator_last_name}
+                  Creator: {item?.creator_first_name} {item?.creator_last_name}
                 </li>
-                <li>Template: {name}</li>
+                {/* <li>Project: {name}</li> */}
                 {/* <li>Description: {description}</li> */}
                 <li>Version: V:1.0.1</li>
               </ul>
               <div className="button-section">
                 <a
                   href="javascript:void(0)"
-                  onClick={() => {
-                    if (window.confirm("Are you sure to delete this record?")) {
-                      deleteHandler(item.projectId);
-                    }
-                  }}
+                  // onClick={() => {
+                  //   if (window.confirm("Are you sure to delete this record?")) {
+                  //     deleteHandler(item.projectId);
+                  //   }
+                  // }}
                   title="delete"
                 >
                   <img src={trashIconImg} className="action-icon" />
@@ -117,9 +129,9 @@ const ProductCard = ({
                 <a
                   href="javascript:void(0)"
                   title="copy"
-                  onClick={() => {
-                    projectEditHandler(item.projectId, "copy");
-                  }}
+                  // onClick={() => {
+                  //   projectEditHandler(item.projectId, "copy");
+                  // }}
                   // /* onClick={() => {if(window.confirm('Are you sure to copy this project?')){ copyHandler(item.projectId)};}} */ title="create-new-project"
                 >
                   <img src={cloneIconImg} className="action-icon" />
@@ -129,9 +141,10 @@ const ProductCard = ({
                   className="setting"
                   href="javascript:void(0)"
                   title="setting"
-                  onClick={
-                    settingHandler
-                  } /* onClick={e => setState({settingBox:item.projectId})} */
+                  // onClick={
+                  //   settingHandler
+                  // } 
+                  /* onClick={e => setState({settingBox:item.projectId})} */
                 >
                   <img src={settingIconImg} className="action-icon" />
                 </a>
@@ -146,9 +159,9 @@ const ProductCard = ({
                         className={`${
                           item.projectStatus == "1" ? "active" : ""
                         }`}
-                        onClick={() => {
-                          changeStatusHandler(item.projectId, "1");
-                        }}
+                        // onClick={() => {
+                        //   changeStatusHandler(item.projectId, "1");
+                        // }}
                       >
                         Active
                       </a>
@@ -159,9 +172,9 @@ const ProductCard = ({
                         className={`${
                           item.projectStatus == "2" ? "active" : ""
                         }`}
-                        onClick={() => {
-                          changeStatusHandler(item.projectId, "2");
-                        }}
+                        // onClick={() => {
+                        //   changeStatusHandler(item.projectId, "2");
+                        // }}
                       >
                         {" "}
                         Active - Locked
@@ -173,9 +186,9 @@ const ProductCard = ({
                         className={`${
                           item.projectStatus == "3" ? "active" : ""
                         }`}
-                        onClick={() => {
-                          changeStatusHandler(item.projectId, "3");
-                        }}
+                        // onClick={() => {
+                        //   changeStatusHandler(item.projectId, "3");
+                        // }}
                       >
                         {" "}
                         Sent for Review
@@ -187,9 +200,9 @@ const ProductCard = ({
                         className={`${
                           item.projectStatus == "4" ? "active" : ""
                         }`}
-                        onClick={() => {
-                          changeStatusHandler(item.projectId, "4");
-                        }}
+                        // onClick={() => {
+                        //   changeStatusHandler(item.projectId, "4");
+                        // }}
                       >
                         Approved
                       </a>
@@ -200,9 +213,9 @@ const ProductCard = ({
                         className={`${
                           item.projectStatus == "5" ? "active" : ""
                         }`}
-                        onClick={() => {
-                          changeStatusHandler(item.projectId, "5");
-                        }}
+                        // onClick={() => {
+                        //   changeStatusHandler(item.projectId, "5");
+                        // }}
                       >
                         Archived
                       </a>
@@ -210,9 +223,9 @@ const ProductCard = ({
                     <li>
                       <a
                         href="javascript:void(0)"
-                        onClick={() => {
-                          projectEditHandler(item.projectId, "edit");
-                        }}
+                        // onClick={() => {
+                        //   projectEditHandler(item.projectId, "edit");
+                        // }}
                       >
                         Edit Details
                       </a>

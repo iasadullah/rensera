@@ -238,7 +238,7 @@ export const genereateHtmlApi = async (req) => {
 };
 
 export const convertHtmlApi = async (req,fileName) => {
-  console.log("the api is....",req)
+  console.log("the api is....",req,fileName)
   return await resolve(
     axios.post(localApiBase + ApiName.convertHtml, {name:req,fileName:fileName}).then((res) => res.data)
   );
