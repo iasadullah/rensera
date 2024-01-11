@@ -9,7 +9,7 @@ import thumbnailPreviewImg from "../assets/images/thumbnail-preview-overlay.png"
 import { convertHtmlApi } from "../services/api";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import Loading from "./Loading";
-
+import axios from "axios";
 const ProductCard = ({
   item,
   previewHandler,
@@ -17,33 +17,53 @@ const ProductCard = ({
   projectEditHandler,
   settingHandler,
   changeStatusHandler,
-  projectData
+  projectData,
 }) => {
-  const history=useHistory()
-  const [loading,setLoading]=useState(false)
+  const history = useHistory();
+  const [loading, setLoading] = useState(false);
   // const [image,created_at, name, creator_first_name,creator_last_name] = projectData;
   // console.log("The image Tamplate is::",projectData)
-const handleClick=async(project_name,file_name)=>{
-setLoading(true)
-  console.log("pojectName ::",project_name,file_name)
-  let res = await convertHtmlApi(file_name,project_name);
-          console.log("Convert to html:", res);
-setLoading(false)
+  const handleClick = async (project_name, file_name) => {
+    setLoading(true);
+    console.log("pojectName ::", project_name, file_name);
+    let res = await convertHtmlApi(file_name, project_name);
+    console.log("Convert to html:", res);
+    setLoading(false);
 
-          history.push('/edit-html', { fileName: file_name, fileNameTemaplate:project_name })
-}
+    history.push("/edit-html", {
+      fileName: file_name,
+      fileNameTemaplate: project_name,
+    });
+  };
+
+  const handleDownloadPdf = async (pdfName) => {
+    console.log("the exect of pdfPath pdf is::", pdfName);
+    try {
+      const response = await axios({
+        url: `http://localhost:4000/api/download/${pdfName}`,
+        method: "GET",
+        responseType: "blob", // Important
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `${pdfName}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+    } catch (error) {
+      console.error("Error downloading PDF", error);
+    }
+  };
   return (
-    
     <div className="col-xl-3 col-sm-12 col-lg-6 col-md-12 col-xs-12">
-      {
-        loading&&<Loading/>
-      }
+      {loading && <Loading />}
       <div className="card">
         <div className="card-body">
           <h5 className="card-title">
             <div
               className="upload-btn"
-              onClick={()=>handleClick(item.project_name,item.filepath)}
+              onClick={() => handleClick(item.project_name, item.filepath)}
               style={{
                 color: `${
                   item.projectStatus == 1
@@ -59,13 +79,15 @@ setLoading(false)
                     : ""
                 }`,
                 fontWeight: "bold",
-                cursor:'pointer'
+                cursor: "pointer",
               }}
             >
               {item?.project_name}
             </div>
           </h5>
-          <div className="latest-update">Created Date: {item?.created_at.substring(0, 10)}</div>
+          <div className="latest-update">
+            Created Date: {item?.created_at.substring(0, 10)}
+          </div>
           {/* <div className="latest-update">Last Updated: {item.modified}</div> */}
           <div className="status">
             Status:{" "}
@@ -86,12 +108,7 @@ setLoading(false)
           <div className="img-box-text">
             <div className="thumbnail">
               {item.productImage != null ? (
-                <img
-                  className="thumb"
-                  src=''
-                  alt=""
-                  width="129"
-                />
+                <img className="thumb" src="" alt="" width="129" />
               ) : (
                 <img className="thumb" src={item?.image} alt="" width="129" />
               )}
@@ -99,18 +116,18 @@ setLoading(false)
                 <img
                   src={thumbnailPreviewImg}
                   alt=""
-                  onClick={()=>previewHandler(item?.image)}
+                  onClick={() => previewHandler(item?.image)}
                 />
               </a>
             </div>
 
             <div className="right-part">
               <ul>
-                {/* <li>Team: {item.teamName}</li> */}
+                <li>Team: {item.team}</li>
                 <li>
                   Creator: {item?.creator_first_name} {item?.creator_last_name}
                 </li>
-                {/* <li>Project: {name}</li> */}
+                <li>Template: {item?.project_name}</li>
                 {/* <li>Description: {description}</li> */}
                 <li>Version: V:1.0.1</li>
               </ul>
@@ -128,11 +145,12 @@ setLoading(false)
                 </a>
                 <a
                   href="javascript:void(0)"
-                  title="copy"
+                  title="download pdf"
                   // onClick={() => {
                   //   projectEditHandler(item.projectId, "copy");
                   // }}
                   // /* onClick={() => {if(window.confirm('Are you sure to copy this project?')){ copyHandler(item.projectId)};}} */ title="create-new-project"
+                  onClick={() => handleDownloadPdf(item.project_name)}
                 >
                   <img src={cloneIconImg} className="action-icon" />
                 </a>
@@ -143,7 +161,7 @@ setLoading(false)
                   title="setting"
                   // onClick={
                   //   settingHandler
-                  // } 
+                  // }
                   /* onClick={e => setState({settingBox:item.projectId})} */
                 >
                   <img src={settingIconImg} className="action-icon" />

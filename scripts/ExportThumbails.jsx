@@ -33,7 +33,7 @@ if (hasExtension) {
 
 // Now 'filePath' and 'fileName' contain the desired values based on your conditions
 
-  var configFile = File("C:/Users/Administrator/Desktop/rensera/scripts/config.json");
+  var configFile = File("D:/Office/SigmaSquare/renser-dev/rensera/scripts/config.json");
   configFile.open("r");
   var configData = configFile.read();
   configFile.close();

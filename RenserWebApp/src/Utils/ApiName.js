@@ -5,6 +5,10 @@ export const ApiName = {
   generateHtml: "/generateHtml",
   templateFileMetaData: "/templateFileMetaData",
   generatePdf: "/generatePdfTest",
-  createThumbnails:"/creatingThumbnails",
-  convertHtml:'/convertHtml'
+  createThumbnails: "/creatingThumbnails",
+  convertHtml: "/convertHtml",
+  allOfficeList: "/allOfficesList",
+  allIndustriesList: "/allIndustriesList",
+  allTeamsList: "/allTeamsList",
+  allLeadPracticeGroupList: "/allLeadPracticeGroupList",
 };

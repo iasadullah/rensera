@@ -8,7 +8,7 @@ const axios = require("axios");
 const xml2js = require("xml2js");
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
-const fse = require('fs-extra');
+const fse = require("fs-extra");
 const multer = require("multer");
 const { check, validationResult } = require("express-validator");
 const config = require("../Config");
@@ -169,7 +169,7 @@ router.get("/templateList", async (req, res) => {
           [".jpeg", ".jpg", ".png"].includes(path.extname(file))
         );
         if (imageFile) {
-          image = `http://3.132.112.94:4000/public/templates/${project.template_name}/${imageFile}`;
+          image = `http://localhost:4000/public/templates/${project.template_name}/${imageFile}`;
         }
       }
 
@@ -277,8 +277,9 @@ router.get("/fileMetaData/:filename", (req, res) => {
           <soap:RunScript>
               <runScriptParameters>
                   <scriptLanguage>javascript</scriptLanguage>
-                  <scriptFile>${config.scriptFilePath
-      }/InDesignMeta.jsx</scriptFile>
+                  <scriptFile>${
+                    config.scriptFilePath
+                  }/InDesignMeta.jsx</scriptFile>
                   <scriptArgs>
                       <name>arg1</name>
                       <value>${config.uploadPath + filePath}</value>
@@ -300,7 +301,7 @@ router.get("/fileMetaData/:filename", (req, res) => {
           } else {
             const scriptResultData =
               result["SOAP-ENV:Envelope"]["SOAP-ENV:Body"][0][
-              "IDSP:RunScriptResponse"
+                "IDSP:RunScriptResponse"
               ][0]["scriptResult"][0]["data"][0]["_"];
 
             let scriptResult;
@@ -325,39 +326,17 @@ router.get("/fileMetaData/:filename", (req, res) => {
   });
 });
 
-//create new project
-// router.post("/createNewProject", async (req, res) => {
-//   const { projectName, creatorFirstName, creatorLastName, templateId } =
-//     req.body;
-
-//   // Validate the incoming data
-//   if (!projectName || !creatorFirstName || !creatorLastName || !templateId) {
-//     return res.status(400).json({ error: "Missing required fields" });
-//   }
-
-//   try {
-
-//     // Insert the project into the database
-//     // const result = await db.query(
-//     //   "INSERT INTO newprojects (project_name, creator_first_name, creator_last_name, template_id) VALUES ($1, $2, $3, $4) RETURNING *",
-//     //   [projectName, creatorFirstName, creatorLastName, templateId]
-//     // );
-
-//     // // Return the inserted project
-//     // res.status(201).json({
-//     //   status: 201,
-//     //   response: "Project created successfully",
-//     //   data: result.rows[0],
-//     // });
-
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ error: "Could not create project" });
-//   }
-// });
 router.post("/createNewProject", async (req, res) => {
-  const { projectName, creatorFirstName, creatorLastName, templateId } = req.body;
-
+  const {
+    projectName,
+    creatorFirstName,
+    creatorLastName,
+    office,
+    leadpracticegroup,
+    industry,
+    team,
+    templateId,
+  } = req.body;
   // Validate the incoming data
   if (!projectName || !creatorFirstName || !creatorLastName || !templateId) {
     return res.status(400).json({ error: "Missing required fields" });
@@ -365,11 +344,19 @@ router.post("/createNewProject", async (req, res) => {
 
   try {
     // Create the directory for the project
-    const projectDir = path.join(__dirname, "..", "public", "projects", projectName);
+    const projectDir = path.join(
+      __dirname,
+      "..",
+      "public",
+      "projects",
+      projectName
+    );
 
     // If the directory already exists, return an error
     if (fs.existsSync(projectDir)) {
-      return res.status(400).json({ error: "Project directory already exists" });
+      return res
+        .status(400)
+        .json({ error: "Project directory already exists" });
     }
 
     // Create the directory
@@ -377,8 +364,18 @@ router.post("/createNewProject", async (req, res) => {
 
     // Insert the project into the database with the path of the created folder
     const result = await db.query(
-      "INSERT INTO newprojects (project_name, creator_first_name, creator_last_name, template_id, created_at, filepath) VALUES ($1, $2, $3, $4, NOW(), $5) RETURNING *",
-      [projectName, creatorFirstName, creatorLastName, templateId, projectDir]
+      "INSERT INTO newprojects (project_name, creator_first_name, creator_last_name, template_id, created_at, filepath,office,leadpracticegroup,industry,team) VALUES ($1, $2, $3, $4, NOW(), $5,$6,$7,$8,$9) RETURNING *",
+      [
+        projectName,
+        creatorFirstName,
+        creatorLastName,
+        templateId,
+        projectDir,
+        office,
+        leadpracticegroup,
+        industry,
+        team,
+      ]
     );
 
     // Return the inserted project
@@ -392,11 +389,75 @@ router.post("/createNewProject", async (req, res) => {
     res.status(500).json({ error: "Could not create project" });
   }
 });
+//getAllofficesList
+router.get("/allOfficesList", async (req, res) => {
+  try {
+    // Get all projects from the database
+    const result = await db.query("SELECT * FROM offices");
 
+    // Return the projects
+    res.status(200).json({
+      status: 200,
+      data: result,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Could not get projects" });
+  }
+});
 
+//getAllIndustryList
+router.get("/allIndustriesList", async (req, res) => {
+  try {
+    // Get all projects from the database
+    const result = await db.query("SELECT * FROM industries");
+    console.log("the result of the all industries api is::", result);
+
+    // Return the projects
+    res.status(200).json({
+      status: 200,
+      data: result,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Could not get projects" });
+  }
+});
+//getAllTeamsList
+router.get("/allTeamsList", async (req, res) => {
+  try {
+    // Get all projects from the database
+    const result = await db.query("SELECT * FROM teams");
+
+    // Return the projects
+    res.status(200).json({
+      status: 200,
+      data: result,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Could not get projects" });
+  }
+});
+//getAllTeamsList
+router.get("/allLeadPracticeGroupList", async (req, res) => {
+  try {
+    // Get all projects from the database
+    const result = await db.query("SELECT * FROM leadpracticegroup");
+
+    // Return the projects
+    res.status(200).json({
+      status: 200,
+      data: result,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Could not get projects" });
+  }
+});
 const generateThumbnail = async (projectName, projectFilePath) => {
-  console.log("The config.scriptFilePath is:", config.scriptFilePath)
-  console.log("The projectFilePath:", projectFilePath)
+  // console.log("The config.scriptFilePath is:", config.scriptFilePath);
+  // console.log("The projectFilePath:", projectFilePath);
   try {
     const xmls = `<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:soap="http://ns.adobe.com/InDesign/soap/">
       <soapenv:Body>
@@ -413,21 +474,18 @@ const generateThumbnail = async (projectName, projectFilePath) => {
       </soapenv:Body>
   </soapenv:Envelope>`;
 
-   let res=await axios
+    let res = await axios
       .post("http://localhost:1234", xmls, {
         headers: { "Content-Type": "text/xml" },
       })
       .then((response) => {
-        console.log("response genertate thumbnials ::",response)
+        // console.log("response genertate thumbnials ::", response);
         xml2js.parseString(response.data, (err, result) => {
           if (err) {
             console.error("Error parsing XML:", err);
             res.status(500).json({ message: "Error parsing XML" });
           } else {
-            
-            console.log("Project created:");
-              
-          
+            // console.log("Project created:");
           }
         });
       })
@@ -435,9 +493,9 @@ const generateThumbnail = async (projectName, projectFilePath) => {
         console.error("Error:", error);
         throw new Error("Error processing file: " + error.message);
       });
-      console.log("res is::",res)
-      return{data:"File Processed!"}
-  } catch (error) { 
+    // console.log("res is::", res);
+    return { data: "File Processed!" };
+  } catch (error) {
     console.error("Error:", error);
     throw new Error("Error processing file: " + error.message);
   }
@@ -448,7 +506,7 @@ router.get("/allofficesList", async (req, res) => {
   try {
     // Get all projects from the database
     const result = await db.query("SELECT * FROM offices");
-    console.log("the result of the all office api is::",result)
+    // console.log("the result of the all office api is::", result);
 
     // Return the projects
     res.status(200).json({
@@ -460,8 +518,6 @@ router.get("/allofficesList", async (req, res) => {
     res.status(500).json({ error: "Could not get projects" });
   }
 });
-
-
 
 // getAllProjectsList
 router.get("/allProjectsList", async (req, res) => {
@@ -490,9 +546,13 @@ router.get("/allProjectsList", async (req, res) => {
         const imageFile = files.find((file) =>
           [".jpeg", ".jpg", ".png"].includes(path.extname(file))
         );
+        const pdfFile = files.find((file) => path.extname(file) === ".pdf");
         if (imageFile) {
-          image = `http://3.132.112.94:4000/public/projects/${project.project_name}/${imageFile}`;
+          image = `http://localhost:4000/public/projects/${project.project_name}/${imageFile}`;
         }
+        // if (pdfFile) {
+        //   pdf = `http://localhost:4000/public/projects/${project.project_name}/${pdfFile}`;
+        // }
       }
 
       // Add the file name and image to the project
@@ -540,11 +600,11 @@ router.get("/templateFileMetaData", async (req, res) => {
         console.error("Error parsing XML:", err);
         return res.status(500).json({ message: "Error parsing XML" });
       }
-            console.log("the response of hte matadata:::",response)
+      // console.log("the response of hte matadata:::", response);
 
       const scriptResultData =
         result["SOAP-ENV:Envelope"]["SOAP-ENV:Body"][0][
-        "IDSP:RunScriptResponse"
+          "IDSP:RunScriptResponse"
         ][0]["scriptResult"][0]["data"][0]["_"];
 
       let scriptResult;
@@ -579,8 +639,9 @@ router.post("/updateTextFrames", (req, res) => {
           <soap:RunScript>
               <runScriptParameters>
                   <scriptLanguage>javascript</scriptLanguage>
-                  <scriptFile>${config.scriptFilePath
-    }/SaveTextFrames.jsx</scriptFile>
+                  <scriptFile>${
+                    config.scriptFilePath
+                  }/SaveTextFrames.jsx</scriptFile>
                   <scriptArgs>
                       <name>arg1</name>
                       <value>${JSON.stringify(selections)}</value>
@@ -621,7 +682,6 @@ router.post("/updateTextFrames", (req, res) => {
 //generatingpdf  of selected
 router.get("/html", (req, res) => {
   const fileNameTemaplate = req.query.fileNameTemaplate;
-  console.log("THe template file name is::", fileNameTemaplate);
   const html = fs.readFileSync(
     path.join(__dirname, `../public/output/${fileNameTemaplate}/output.html`),
     "utf8"
@@ -629,58 +689,63 @@ router.get("/html", (req, res) => {
 
   const mapping = JSON.parse(
     fs.readFileSync(
-      path.join(__dirname, `../public/output/${fileNameTemaplate}/mapping.json`),
+      path.join(
+        __dirname,
+        `../public/output/${fileNameTemaplate}/mapping.json`
+      ),
       "utf8"
     )
-  );
+  ).map((m) => {
+    // Remove unwanted characters and escape sequences from the content
+    m.content = m.content.replace(/[^\x20-\x7E]|[\r\n]/g, "");
+    return m;
+  });
 
   // Parse the HTML
   const dom = new JSDOM(html);
   const document = dom.window.document;
 
-  // Get all p elements
-  const pElements = document.getElementsByTagName("p");
+  // Get all div elements
+  const divElements = document.getElementsByTagName("div");
 
-  // Initialize the start and end indices of the sliding window
-  let start = 0;
-  let end = 0;
+  // Iterate over the div elements
+  for (let div of divElements) {
+    // Get all p elements within the current div
+    const pElements = div.getElementsByTagName("p");
 
-  // Iterate over the p elements
-  while (start < pElements.length) {
     // Initialize an empty string to hold the concatenated text
     let concatenatedText = "";
 
-    // Concatenate the text content of the p tags in the window
-    for (let i = start; i <= end; i++) {
-      concatenatedText += pElements[i].textContent.trim();
+    // Concatenate the text content of the p tags
+    for (let p of pElements) {
+      concatenatedText += p.textContent.trim();
     }
 
     // Find the corresponding mapping object
-    const mappingObject = mapping.find(m => m.content.replace(/\r/g, '') === concatenatedText);
+    const mappingObject = mapping.find(
+      (m) =>
+        m.content.replace(/[\r\n\t]/g, "").trim() ===
+        concatenatedText.replace(/[\r\n\t]/g, "").trim()
+    );
 
     // If a matching mapping object is found
     if (mappingObject) {
-      // Assign the data_id to the p tags in the window
-      for (let i = start; i <= end; i++) {
-        pElements[i].setAttribute("data_id", mappingObject.id);
+      // Assign the data_id to the div
+      // div.setAttribute("data_id", mappingObject.id);
+      for (let p of pElements) {
+        p.setAttribute("data_id", mappingObject.id);
       }
-
-      // Log the matched p tag content and mapping content
-      console.log(`Matched p tag content: ${concatenatedText}`);
-      console.log(`Matched mapping content: ${mappingObject.content}`);
-
-      // Move the window to the next p tag after the matched group
-      start = end + 1;
-      end = start;
-    } else if (end < pElements.length - 1) {
-      // If no match is found and the end of the window is not the last p tag, move the window one p tag forward
-      end++;
+      // Log the matched div content and mapping content
+      console.log(`Matched div content: ${concatenatedText.trim()}`);
+      // console.log(`Matched mapping content: ${mappingObject.content.trim()}`);
     } else {
-      // If no match is found and the end of the window is the last p tag, log the unmatched p tag content and move the window to the next p tag
-      console.log(`Unmatched p tag content: ${concatenatedText}`);
-      console.log(`Unmatched mapping content: ${mapping.map(m => m.content.replace(/\r/g, '')).join(', ')}`);
-      start++;
-      end = start;
+      // If no match is found, log the unmatched div content
+      console.log(`Unmatched div content: ${concatenatedText.trim()}`);
+      // console.log(
+      //   `Unmatched mapping content: ${mapping
+      //     .map((m) => m.content.replace(/\r/g, "").trim())
+      //     .join(", ")}`
+      // );
     }
   }
 
@@ -690,98 +755,13 @@ router.get("/html", (req, res) => {
   res.send({ html: updatedHtml, mapping });
 });
 
-/////
-// router.post("/update", async (req, res) => {
-//   const modifications = req.body.modifications;
-//   const fileName = req.body?.fileName
-//   const isDrupal = req.body?.isDrupal
-//   const articleTitle=req.body?.articleTitle
-// console.log("The request body is::",req.body)
-// console.log("The request body is::",fileName)
-//   // Create an array of modifications in the SOAP request format
-//   const soapModifications = modifications.map((modification) => {
-//     return `
-//       <item>
-//         <data_id>${modification.data_id}</data_id>
-//         <value>${modification.value}</value>
-//         <fileName>${fileName}</fileName>
-//         <isDrupal>${isDrupal}</isDrupal>
-//         <articleTitle>${articleTitle}</articleTitle>
-//       </item>
-//     `;
-//   });
-// console.log("The soup modifications is::",soapModifications)
-//   // Combine all modifications into a single SOAP argument
-//   const soapArguments = `
-//     <scriptArgs>
-//       <name>allArguments</name>
-//       <value>
-//         <dataArray>
-//           ${soapModifications.join("")}
-//         </dataArray>
-        
-//       </value>
-//     </scriptArgs>
-    
-//   `;
-
-//   // Construct the SOAP request
-//   const soapRequest = `
-//     <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:soap="http://ns.adobe.com/InDesign/soap/">
-//       <soapenv:Body>
-//         <soap:RunScript>
-//           <runScriptParameters>
-//             <scriptLanguage>javascript</scriptLanguage>
-//             <scriptFile>${config.scriptFilePath}/UpdateAndExport.jsx</scriptFile>
-//             ${soapArguments}
-//           </runScriptParameters>
-//         </soap:RunScript>
-//       </soapenv:Body>
-//     </soapenv:Envelope>
-//   `;
-
-//   console.log("This is the modified SOAP request:", soapRequest);
-//   try {
-//     const response = await axios.post("http://localhost:1234", soapRequest, {
-//       headers: { "Content-Type": "text/xml" },
-//     });
-
-//     // Parse the XML response
-//     xml2js.parseString(response.data, async(err, result) => {
-//       if (err) {
-//         console.error("Error parsing XML:", err);
-//         return res
-//           .status(500)
-//           .json({ status: 500, message: "Error parsing XML" });
-//       }else{
-//       const result=await generateThumbnail(fileName.split('\\').pop().split('.')[0],fileName)
-//       console.log("The res is::",result)
-//       if(result.data.toLowerCase()==='file processed!'){
-//         res.json({
-//           status: 200,
-//           message: "Text frames updated and document exported successfully",
-          
-//         });
-      
-//       }}
-      
-//     });
-//   } catch (error) {
-//     console.error("Error:", error);
-//     res.status(500).json({
-//       status: 500,
-//       message: "Error updating text frames and exporting document",
-//       error,
-//     });
-//   }
-// });
 router.post("/update", async (req, res) => {
   const modifications = req.body.modifications;
-  const fileName = req.body?.fileName
-  const outputPath = req.body?.outputPath
-  const indesignName= req.body?.indesignName
-console.log("The request body is::",req.body)
-console.log("The request body is::",fileName)
+  const fileName = req.body?.fileName;
+  const outputPath = req.body?.outputPath;
+  const indesignName = req.body?.indesignName;
+  console.log("The request body is::", req.body);
+  console.log("The request body is::", fileName);
   // Create an array of modifications in the SOAP request format
   const soapModifications = modifications.map((modification) => {
     return `
@@ -792,7 +772,7 @@ console.log("The request body is::",fileName)
       </item>
     `;
   });
-console.log("The soup modifications is::",soapModifications)
+  console.log("The soup modifications is::", soapModifications);
   // Combine all modifications into a single SOAP argument
   const soapArguments = `
     <scriptArgs>
@@ -841,31 +821,28 @@ console.log("The soup modifications is::",soapModifications)
     });
 
     // Parse the XML response
-    xml2js.parseString(response.data, async(err, result) => {
+    xml2js.parseString(response.data, async (err, result) => {
       if (err) {
         console.error("Error parsing XML:", err);
         return res
           .status(500)
           .json({ status: 500, message: "Error parsing XML" });
-      }else{
+      } else {
         // res.json({
         //   status: 200,
         //   message: "Text frames updated and document exported successfully",
-          
+
         // });
-       
-      const result=await generateThumbnail(fileName,outputPath)
-      console.log("The res is::",result)
-      if(result.data.toLowerCase()==='file processed!'){
-        res.json({
-          status: 200,
-          message: "Text frames updated and document exported successfully",
-          
-        });
-      
+
+        const result = await generateThumbnail(fileName, outputPath);
+        console.log("The res is::", result);
+        if (result.data.toLowerCase() === "file processed!") {
+          res.json({
+            status: 200,
+            message: "Text frames updated and document exported successfully",
+          });
+        }
       }
-    }
-      
     });
   } catch (error) {
     console.error("Error:", error);
@@ -880,10 +857,10 @@ console.log("The soup modifications is::",soapModifications)
 //genratepdf
 router.post("/generatePdfs", async (req, res) => {
   try {
-   const  {arg1}=req.body
-    console.log("genereatepdf ::",req.body)
+    const { arg1 } = req.body;
+    console.log("genereatepdf ::", req.body);
     const pdfPath = path.join(
-      "C:/Users/Administrator/Desktop/rensera/server/generatedHtml/Pdfs",
+      "D:/Office/SigmaSquare/renser-dev/rensera/server/generatedHtml/Pdfs",
       `${arg1}.pdf`
     );
     if (fs.existsSync(pdfPath)) {
@@ -910,11 +887,10 @@ router.post("/generatePdfs", async (req, res) => {
   }
 });
 
-
 //creating thumbnails of files
-router.post('/creatingThumbnails', async (req, res) => {
-  console.log("API of creating thumbnail is calling....")
-  console.log("The REQUEST FILE RESPONSE IS::", req.file);
+router.post("/creatingThumbnails", async (req, res) => {
+  // console.log("API of creating thumbnail is calling....");
+  // console.log("The REQUEST FILE RESPONSE IS::", req.file);
 
   // Call InDesign script after file upload
   const runScriptXml = `<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:soap="http://ns.adobe.com/InDesign/soap/">
@@ -934,21 +910,28 @@ router.post('/creatingThumbnails', async (req, res) => {
 
   try {
     // Call the InDesign server
-    const response = await axios.post('http://localhost:1234', runScriptXml, {
-      headers: { 'Content-Type': 'text/xml' },
+    const response = await axios.post("http://localhost:1234", runScriptXml, {
+      headers: { "Content-Type": "text/xml" },
     });
 
     xml2js.parseString(response.data, (err, result) => {
       if (err) {
-        console.error('Error parsing XML:', err);
-        res.status(500).json({ message: 'Error parsing XML' });
+        console.error("Error parsing XML:", err);
+        res.status(500).json({ message: "Error parsing XML" });
       } else {
-        console.log("The RESULT of the thumbnial api is:::", result)
+        // console.log("The RESULT of the thumbnial api is:::", result);
 
         // Extract the scriptResult data
         const scriptResultData =
-          result['SOAP-ENV:Envelope']['SOAP-ENV:Body'][0]['IDSP:RunScriptResponse'][0]['scriptResult'][0]['data'][0].item[0].data[0]['_'];
-        console.log("The Script result is::", result['SOAP-ENV:Envelope']['SOAP-ENV:Body'][0]['IDSP:RunScriptResponse'][0]['scriptResult'][0]['data'][0].item[0].data[0]['_'])
+          result["SOAP-ENV:Envelope"]["SOAP-ENV:Body"][0][
+            "IDSP:RunScriptResponse"
+          ][0]["scriptResult"][0]["data"][0].item[0].data[0]["_"];
+        // console.log(
+        //   "The Script result is::",
+        //   result["SOAP-ENV:Envelope"]["SOAP-ENV:Body"][0][
+        //     "IDSP:RunScriptResponse"
+        //   ][0]["scriptResult"][0]["data"][0].item[0].data[0]["_"]
+        // );
         let scriptResult;
 
         try {
@@ -956,41 +939,43 @@ router.post('/creatingThumbnails', async (req, res) => {
         } catch (error) {
           scriptResult = scriptResultData;
         }
-        console.log("The Final list is....", scriptResult)
+        // console.log("The Final list is....", scriptResult);
 
         res.status(200).json({
           status: 200,
           message: "File uploaded successfully",
-
         });
       }
     });
   } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ message: 'Error uploading file to InDesign server', error: error });
+    console.error("Error:", error);
+    res.status(500).json({
+      message: "Error uploading file to InDesign server",
+      error: error,
+    });
   }
 });
 
 router.post("/convertHtml", async (req, res) => {
-  const { name, fileName } = req.body
-  console.log("the request is...", req);
-  
-  const folderPath = 'C:/Users/Administrator/Desktop/rensera/server/public/output'
-  
+  const { name, fileName } = req.body;
+  // console.log("the request is...", req);
+
+  const folderPath = `${config.uploadPath}/public/output`;
+
   try {
     // Remove the folder and its contents
     await fse.remove(folderPath);
-    console.log('Folder is removed!');
+    console.log("Folder is removed!");
   } catch (error) {
-    console.error('Error removing folder:', error);
+    console.error("Error removing folder:", error);
   }
- 
+
   const xmls = `<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:soap="http://ns.adobe.com/InDesign/soap/">
     <soapenv:Body>
         <soap:RunScript>
             <runScriptParameters>
                 <scriptLanguage>javascript</scriptLanguage>
-                <scriptFile>C:/Users/Administrator/Desktop/rensera/scripts/convertToHtml.jsx</scriptFile>
+                <scriptFile>${config.scriptFilePath}/convertToHtml.jsx</scriptFile>
                 <scriptArgs>
                     <name>arg1</name>
                     <value>${name}</value>
@@ -1004,7 +989,7 @@ router.post("/convertHtml", async (req, res) => {
     </soapenv:Body>
 </soapenv:Envelope>`;
 
-console.log("ConverToHTML::",xmls)
+  // console.log("ConverToHTML::", xmls);
   try {
     const response = await axios.post("http://localhost:1234", xmls, {
       headers: { "Content-Type": "text/xml" },
@@ -1017,19 +1002,21 @@ console.log("ConverToHTML::",xmls)
         res.status(500).json({ message: "Error parsing XML" });
       } else {
         // Extract the scriptResult data
-        console.log("The result is ::", result["SOAP-ENV:Envelope"]["SOAP-ENV:Body"][0][
-          "IDSP:RunScriptResponse"
-        ][0]["scriptResult"][0]["data"][0]["_"])
+        // console.log(
+        //   "The result is ::",
+        //   result["SOAP-ENV:Envelope"]["SOAP-ENV:Body"][0][
+        //     "IDSP:RunScriptResponse"
+        //   ][0]["scriptResult"][0]["data"][0]["_"]
+        // );
         const scriptResultData =
           result["SOAP-ENV:Envelope"]["SOAP-ENV:Body"][0][
-          "IDSP:RunScriptResponse"
+            "IDSP:RunScriptResponse"
           ][0]["scriptResult"][0]["data"][0]["_"];
 
         let scriptResult;
 
         try {
           scriptResult = JSON.parse(scriptResultData);
-
         } catch (error) {
           scriptResult = scriptResultData;
         }
@@ -1039,9 +1026,10 @@ console.log("ConverToHTML::",xmls)
     });
   } catch (error) {
     console.error("Error:", error);
-    res
-      .status(500)
-      .json({ message: "Error uploading file to InDesign server", error: error });
+    res.status(500).json({
+      message: "Error uploading file to InDesign server",
+      error: error,
+    });
   }
 });
 
@@ -1059,20 +1047,21 @@ router.post("/uploadFile", upload.single("file"), async (req, res) => {
 
   try {
     const result = await db.query(query, values);
-    console.log("inserted into db",result.rows);
+    // console.log("inserted into db", result.rows);
     // var filePath=fileName.replace(/[^\\\/]+$/, '');
-    let resultOfThumbnails = await generateThumbnail(template, result.rows[0].filepath)
-    console.log("The genrate REsponse is:", resultOfThumbnails?.data)
-    console.log("The genrate REsponse is:", resultOfThumbnails)
-    if(resultOfThumbnails.data){
+    let resultOfThumbnails = await generateThumbnail(
+      template,
+      result.rows[0].filepath
+    );
+    // console.log("The genrate REsponse is:", resultOfThumbnails?.data);
+    // console.log("The genrate REsponse is:", resultOfThumbnails);
+    if (resultOfThumbnails.data) {
       res.status(201).json({
         status: 201,
         message: "File uploaded successfully",
         data: result.rows[0],
       });
     }
-   
-
   } catch (error) {
     console.error("Error executing query", error.stack);
     if (error.constraint === "template_name_unique") {
@@ -1086,11 +1075,11 @@ router.post("/uploadFile", upload.single("file"), async (req, res) => {
 
 router.post("/updateHome", async (req, res) => {
   const modifications = req.body.modifications;
-  const fileName = req.body?.fileName
-  const outputPath = req.body?.outputPath
-  const indesignName= req.body?.indesignName
-console.log("The request body is::",req.body)
-console.log("The request body is::",fileName)
+  const fileName = req.body?.fileName;
+  const outputPath = req.body?.outputPath;
+  const indesignName = req.body?.indesignName;
+  // console.log("The request body is::", req.body);
+  // console.log("The request body is::", fileName);
   // Create an array of modifications in the SOAP request format
   const soapModifications = modifications.map((modification) => {
     return `
@@ -1101,7 +1090,7 @@ console.log("The request body is::",fileName)
       </item>
     `;
   });
-console.log("The soup modifications is::",soapModifications)
+  // console.log("The soup modifications is::", soapModifications);
   // Combine all modifications into a single SOAP argument
   const soapArguments = `
     <scriptArgs>
@@ -1143,38 +1132,35 @@ console.log("The soup modifications is::",soapModifications)
     </soapenv:Envelope>
   `;
 
-  console.log("This is the modified SOAP request:", soapRequest);
+  // console.log("This is the modified SOAP request:", soapRequest);
   try {
     const response = await axios.post("http://localhost:1234", soapRequest, {
       headers: { "Content-Type": "text/xml" },
     });
 
     // Parse the XML response
-    xml2js.parseString(response.data, async(err, result) => {
+    xml2js.parseString(response.data, async (err, result) => {
       if (err) {
         console.error("Error parsing XML:", err);
         return res
           .status(500)
           .json({ status: 500, message: "Error parsing XML" });
-      }else{
+      } else {
         // res.json({
         //   status: 200,
         //   message: "Text frames updated and document exported successfully",
-          
+
         // });
-      
-      const result=await generateThumbnail(fileName,outputPath)
-      console.log("The res is of update thumbnail api is::",result)
-      if(result.data.toLowerCase()==='file processed!'){
-        res.json({
-          status: 200,
-          message: "Text frames updated and document exported successfully",
-          
-        });
-      
+
+        const result = await generateThumbnail(fileName, outputPath);
+        // console.log("The res is of update thumbnail api is::", result);
+        if (result.data.toLowerCase() === "file processed!") {
+          res.json({
+            status: 200,
+            message: "Text frames updated and document exported successfully",
+          });
+        }
       }
-    }
-      
     });
   } catch (error) {
     console.error("Error:", error);
@@ -1186,4 +1172,11 @@ console.log("The soup modifications is::",soapModifications)
   }
 });
 
+router.get("/download/:pdfName", function (req, res) {
+  const file = path.resolve(
+    __dirname,
+    `../public/projects/${req.params.pdfName}/${req.params.pdfName}.pdf`
+  );
+  res.download(file); // Set disposition and send it.
+});
 module.exports = router;

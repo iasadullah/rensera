@@ -8,7 +8,7 @@ const UploadFileScreen = () => {
   const [templateName, setTemplateName] = useState("");
 
   const props = {
-    action: `http://3.132.112.94:4000/api/uploadFile?template=${templateName}`,
+    action: `http://localhost:4000/api/uploadFile?template=${templateName}`,
     onChange(info) {
       if (info.file.status !== "uploading") {
         console.log(info.file, info.fileList);

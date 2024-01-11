@@ -3,7 +3,7 @@ import axios from "axios";
 import { ApiName } from "../Utils/ApiName";
 let apiBase = "/";
 // let localApiBase = "http://localhost:4000/api";
-let localApiBase = "http://3.132.112.94:4000/api";
+let localApiBase = "http://localhost:4000/api";
 export const fetchAllProject = async () => {
   return await resolve(
     axios.get(apiBase + "getAllProjectList").then((res) => res.data)
@@ -220,7 +220,9 @@ export const getAllTemplateListApi = async (req) => {
 };
 export const getAllProjecstList = async (req) => {
   return await resolve(
-    axios.get(localApiBase + ApiName.allprojectsList, req).then((res) => res.data)
+    axios
+      .get(localApiBase + ApiName.allprojectsList, req)
+      .then((res) => res.data)
   );
 };
 export const createNewProjectApi = async (req) => {
@@ -237,10 +239,15 @@ export const genereateHtmlApi = async (req) => {
   );
 };
 
-export const convertHtmlApi = async (req,fileName) => {
-  console.log("the api is....",req,fileName)
+export const convertHtmlApi = async (req, fileName) => {
+  console.log("the api is....", req, fileName);
   return await resolve(
-    axios.post(localApiBase + ApiName.convertHtml, {name:req,fileName:fileName}).then((res) => res.data)
+    axios
+      .post(localApiBase + ApiName.convertHtml, {
+        name: req,
+        fileName: fileName,
+      })
+      .then((res) => res.data)
   );
 };
 
@@ -264,4 +271,31 @@ export const createThumbnails = async (selections) => {
   return await axios
     .post(localApiBase + ApiName.createThumbnails, { args: selections })
     .then((res) => res.data);
+};
+export const getAllOfficeList = async (req) => {
+  return await resolve(
+    axios.get(localApiBase + ApiName.allOfficeList, req).then((res) => res.data)
+  );
+};
+
+export const getAllTeamList = async (req) => {
+  return await resolve(
+    axios.get(localApiBase + ApiName.allTeamsList, req).then((res) => res.data)
+  );
+};
+
+export const getAllIndustryList = async (req) => {
+  return await resolve(
+    axios
+      .get(localApiBase + ApiName.allIndustriesList, req)
+      .then((res) => res.data)
+  );
+};
+
+export const getAllLeadPracticeGroupList = async (req) => {
+  return await resolve(
+    axios
+      .get(localApiBase + ApiName.allLeadPracticeGroupList, req)
+      .then((res) => res.data)
+  );
 };

@@ -66,7 +66,9 @@ function main() {
 
   var myTemplateFile = new File(filePath);
 
-var myPDFfile = new File("C:/Users/Administrator/Desktop/rensera/Pdfs/Demo.pdf");
+  var myPDFfile = new File(
+    "D:/Office/SigmaSquare/renser-dev/rensera/Pdfs/Demo.pdf"
+  );
   var doc = app.open(myTemplateFile);
 
   // get scriptArgs and update
@@ -83,5 +85,3 @@ var myPDFfile = new File("C:/Users/Administrator/Desktop/rensera/Pdfs/Demo.pdf")
 }
 
 main();
-
-
