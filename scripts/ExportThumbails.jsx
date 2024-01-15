@@ -50,7 +50,7 @@ if (hasExtension) {
   var folder = new Folder(folderPath);
   var namesList=[];
   if (folder.exists) {
-    var fileTypes = ["*.indd", "*.indx", "*.indt"];
+    var fileTypes = ["*.indd", "*.indx", "*.indt","*.idml"];
     var fileList = [];
     var processedDocuments = {}; // To keep track of processed documents
   
@@ -85,7 +85,7 @@ if (hasExtension) {
         $.writeln("List is....." + namesList);
    //namesList.push(myFile.name);
         // Create a thumbnail of the first page
-        var thumbnailFileName = myFile.name.replace(/\.(indt|indd)$/, '')
+        var thumbnailFileName = myFile.name.replace(/\.(indt|indd|idml)$/, '')
         + ".jpg"; // Change the file format if needed
         var thumbnailPath = newFolder + "/" + thumbnailFileName;
         var thumbnailFile = new File(thumbnailPath);
@@ -97,7 +97,7 @@ if (hasExtension) {
         // Export the first page as a JPEG
         myDocument.exportFile(
           ExportFormat.pdfType,
-          File(pdfFilePath + myFile.name.replace(/\.(indt|indd)$/, '')
+          File(pdfFilePath + myFile.name.replace(/\.(indt|indd|idml)$/, '')
           + ".pdf")
         );
   
@@ -161,7 +161,7 @@ if (hasExtension) {
             now.getMilliseconds() + 'Z';
           // Export the first page as a PNG
           var pngFilePath = new File(
-            newFolder + "/" +  myFile.name.replace(/\.(indt|indd)$/, '') + ".png"
+            newFolder + "/" +  myFile.name.replace(/\.(indt|indd|idml)$/, '') + ".png"
         );
           pdfRect.exportFile(ExportFormat.PNG_FORMAT, pngFilePath);
         }
